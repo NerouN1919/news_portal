@@ -1,6 +1,6 @@
 # Новостной портал 
 ## Развёртывание базы данных в докер контейнере 
-**Предварительно сделать docker login**  
 В PowerShell вписать: 
+**Предварительно сделать docker login**  
 - docker compose build 
 - docker compose up -d
