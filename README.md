@@ -6,7 +6,7 @@
 - docker compose build 
 - docker compose up -d
 ## Логин и пароль для доступа к API до внедрения JWT токена
--- login : admin
+-- login : admin  
 -- password : admin
 ## Просмотр документации по использованию REST API
   
