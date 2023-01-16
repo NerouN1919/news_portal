@@ -99,9 +99,10 @@ public class PostsDAO {
         session.save(users);
         session.save(posts);
         return new ResponseEntity<>(new ResultLikeDTO(posts.getId(), posts.getLike()), HttpStatus.OK);
-    }  public GetPostDTO getPost(Long id){
+    }
+    public GetPostDTO getPost(Long id){
         Session session = entityManager.unwrap(Session.class);
         Posts posts = session.get(Posts.class, id);
-        return new GetPostDTO(posts.getId(), posts.getLike(), posts.getTitle(), posts.getPathToPhoto());
+        return new GetPostDTO(posts.getId(), posts.getDate(), posts.getLike(), posts.getTitle(), posts.getPathToPhoto());
     }
 }

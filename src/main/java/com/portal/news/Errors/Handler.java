@@ -13,4 +13,10 @@ public class Handler {
         info.setInfo(exception.getMessage());
         return new ResponseEntity<>(info, HttpStatus.BAD_REQUEST);
     }
+    @ExceptionHandler
+    public ResponseEntity<Info> handle(AuthException exception){
+        Info info = new Info();
+        info.setInfo(exception.getMessage());
+        return new ResponseEntity<>(info, HttpStatus.UNAUTHORIZED);
+    }
 }

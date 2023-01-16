@@ -5,12 +5,14 @@ import com.portal.news.DataBase.Posts;
 import com.portal.news.Services.PostsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 
 @RestController
+@PreAuthorize("hasAuthority('ADMIN')")
 @RequestMapping("/api/posts")
 public class PostsController {
     @Autowired
@@ -27,11 +29,11 @@ public class PostsController {
     public ResponseEntity<?> downloadImage(@PathVariable("fileCode") String fileCode) {
         return postsService.downloadImage(fileCode);
     }
-    @PostMapping("/like")
+    @PutMapping("/like")
     public ResponseEntity<ResultLikeDTO> like(@RequestBody LikeDTO likeDTO){
         return postsService.like(likeDTO);
     }
-    @PostMapping("/unlike")
+    @PutMapping("/unlike")
     public ResponseEntity<ResultLikeDTO> unlike(@RequestBody LikeDTO likeDTO){
         return postsService.unlike(likeDTO);
     }

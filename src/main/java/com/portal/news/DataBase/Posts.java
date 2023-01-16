@@ -17,6 +17,8 @@ public class Posts {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     private Long id;
+    @Column(name = "date")
+    private Date date = new Date();
     @Column(name = "like")
     private Long like;
     @Column(name = "pathToPhoto")
