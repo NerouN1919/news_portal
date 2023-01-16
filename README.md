@@ -8,11 +8,12 @@
 ## Получение и работа с JWT  
 Для получения сделать POST запрос: "http://localhost:8080/api/auth/login"  
 Тело запроса смотреть в документации к API    
-login : SviridenkoAdmin  
-password : 12345  
+login : **SviridenkoAdmin**  
+password : **12345**  
 Или:  
-login : MorozovAdmin  
-password : 12345  
+login : **MorozovAdmin**  
+password : **12345**  
+
 -------------------------  
 Полученные JWT вставлять в headers запросов  
 ## Просмотр документации по использованию REST API
