@@ -7,8 +7,8 @@
 - docker compose up -d
 ## Получение и работа с JWT  
 Для получения сделать POST запрос: "http://localhost:8080/api/auth/login"  
-  
 Тело запроса смотреть в документации к API  
+  
 login : **SviridenkoAdmin**  
 password : **12345**  
 Или:  
