@@ -2,11 +2,11 @@ package com.portal.news.DTO;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
+@NoArgsConstructor
 @AllArgsConstructor
-public class AddPostDTO {
-    private String title;
-    private String text;
-    private String imagePath;
+public class IdForNextDTO {
+    private Long idForNext;
 }

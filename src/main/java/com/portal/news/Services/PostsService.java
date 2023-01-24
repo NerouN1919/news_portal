@@ -10,12 +10,13 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.List;
 
 @Service
 public class PostsService {
     @Autowired
     private PostsDAO postsDAO;
-    public ResponseEntity<Posts> addPost(AddPostDTO addPostDTO){
+    public ResponseEntity<Posts> addPost(AddPostDTO addPostDTO) throws IOException {
         return postsDAO.addPost(addPostDTO);
     }
     public ResponseEntity<UploadDTO> uploadImageToPost(MultipartFile multipartFile) throws IOException {
@@ -33,7 +34,15 @@ public class PostsService {
         return postsDAO.unlike(likeDTO);
     }
     @Transactional
-    public GetPostDTO getPost(Long id){
+    public ResponseEntity<GetPostDTO> getPost(Long id){
         return postsDAO.getPost(id);
+    }
+    @Transactional
+    public ResponseEntity<List<?>> getPosts(Long from, Long howMuch){
+        return postsDAO.getPosts(from, howMuch);
+    }
+    @Transactional
+    public ResponseEntity<HowManyDTO> howManyPosts(){
+        return postsDAO.howManyPosts();
     }
 }

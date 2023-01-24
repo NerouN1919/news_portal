@@ -1,9 +1,6 @@
 package com.portal.news.DAO;
 
-import com.portal.news.DTO.AddCommentDTO;
-import com.portal.news.DTO.GetCommentDTO;
-import com.portal.news.DTO.HowManyCommentsDTO;
-import com.portal.news.DTO.ReturnedCommentDTO;
+import com.portal.news.DTO.*;
 import com.portal.news.DataBase.Comments;
 import com.portal.news.DataBase.Posts;
 import com.portal.news.DataBase.Users;
@@ -20,10 +17,7 @@ import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 @Repository
 public class CommentsDAO {
@@ -49,36 +43,62 @@ public class CommentsDAO {
         session.save(posts);
         session.save(comments);
     }
-    public ResponseEntity<HowManyCommentsDTO> howManyComments(Long id){
+    public ResponseEntity<HowManyDTO> howManyComments(Long id){
         Session session = entityManager.unwrap(Session.class);
         Posts posts = session.get(Posts.class, id);
         if (posts == null){
             throw new Failed("Not such post");
         }
-        return new ResponseEntity<>(new HowManyCommentsDTO((long) posts.getComments().size()), HttpStatus.OK);
+        return new ResponseEntity<>(new HowManyDTO((long) posts.getComments().size()), HttpStatus.OK);
     }
-    public ResponseEntity<List<ReturnedCommentDTO>> getComments(GetCommentDTO getCommentDTO){
+    private List<Comments> getListForGetComments(Session session, Long from, Long howMuch, Long postId){
+        return session.createQuery("select e from Comments e where e.id >= :first " +
+                        "and e.id <= :second and e.post = :third", Comments.class)
+                .setParameter("first", from-howMuch)
+                .setParameter("second", from)
+                .setParameter("third", session.get(Posts.class, postId))
+                .getResultList();
+    }
+    public ResponseEntity<List<?>> getComments(Long from, Long howMuch, Long postId){
+        if(from < 0){
+            throw new Failed("Bad from id");
+        }
+        if(howMuch < 0){
+            throw new Failed("Bad howMuch");
+        }
         Session session = entityManager.unwrap(Session.class);
-        Posts posts = session.get(Posts.class, getCommentDTO.getPostId());
-        if(posts==null){
-            throw new Failed("Not such post");
+        if(session.get(Posts.class, postId) == null){
+            throw new Failed("No such post");
         }
-        List<Comments> list = posts.getComments();
-        if(getCommentDTO.getHowMuch() > list.size()){
-            throw new Failed("Haven't such comments");
+        if(from == 0){
+            from = session.createQuery("select a from Comments a order by a.id desc ", Comments.class)
+                    .setMaxResults(1).getResultList().get(0).getId();
         }
-        List<ReturnedCommentDTO> result = new ArrayList<>();
-        for(int i = list.size()-1; i >= list.size() - getCommentDTO.getHowMuch(); i--){
-            Comments in = list.get(i);
-            ReturnedCommentDTO returnedCommentDTO = new ReturnedCommentDTO(in.getPost().getId(),
-                    in.getUser().getId(), in.getDate());
+        List<Comments> list = getListForGetComments(session, from, howMuch, postId);
+        long beforeHowMuch = howMuch;
+        while(list.size()!=beforeHowMuch){
+            howMuch++;
+            list = getListForGetComments(session, from, howMuch, postId);
+        }
+        Collections.reverse(list);
+        List<Object> result = new ArrayList<>();
+        for(Comments in: list){
+            String content;
             try {
-                String content = Files.readString(Paths.get("Comments\\"+in.getHrefToComment()+".txt"));
-                returnedCommentDTO.setComment(content);
-                result.add(returnedCommentDTO);
+                content = Files.readString(Paths.get("Comments\\"+in.getHrefToComment()+".txt"));
             } catch (IOException e){
                 throw new Failed("No such file");
             }
+            result.add(new ReturnedCommentDTO(content, in.getPost().getId(), in.getUser().getId(), in.getDate()));
+        }
+        try {
+            result.add(new IdForNextDTO(session.createQuery("select a from Comments a where a.id < :first and " +
+                                    "a.post=:second",
+                            Comments.class).setParameter("first", list.get(list.size()-1).getId())
+                    .setParameter("second", session.get(Posts.class, postId))
+                    .setMaxResults(1).getResultList().get(0).getId()));
+        } catch (IndexOutOfBoundsException e){
+            result.add(new IdForNextDTO(null));
         }
         return new ResponseEntity<>(result, HttpStatus.OK);
     }

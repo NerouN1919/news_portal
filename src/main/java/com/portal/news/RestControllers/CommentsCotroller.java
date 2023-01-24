@@ -1,9 +1,7 @@
 package com.portal.news.RestControllers;
 
 import com.portal.news.DTO.AddCommentDTO;
-import com.portal.news.DTO.GetCommentDTO;
-import com.portal.news.DTO.HowManyCommentsDTO;
-import com.portal.news.DTO.ReturnedCommentDTO;
+import com.portal.news.DTO.HowManyDTO;
 import com.portal.news.Services.CommentsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -23,12 +21,14 @@ public class CommentsCotroller {
     public void addComment(@RequestBody AddCommentDTO addCommentDTO) throws IOException {
         commentsService.addComment(addCommentDTO);
     }
-    @PostMapping("/getComments")
-    public ResponseEntity<List<ReturnedCommentDTO>> getComments(@RequestBody GetCommentDTO getCommentDTO){
-        return commentsService.getComments(getCommentDTO);
+    @GetMapping("/getComments/{from}/{howMany}/{post_id}")
+    public ResponseEntity<List<?>> getComments(@PathVariable("from") Long from,
+                                               @PathVariable("howMany") Long howMany,
+                                               @PathVariable("post_id") Long postId){
+        return commentsService.getComments(from, howMany, postId);
     }
     @GetMapping("/howMany/{id}")
-    public ResponseEntity<HowManyCommentsDTO> howManyComments(@PathVariable("id") Long id){
+    public ResponseEntity<HowManyDTO> howManyComments(@PathVariable("id") Long id){
         return commentsService.howManyComments(id);
     }
 }

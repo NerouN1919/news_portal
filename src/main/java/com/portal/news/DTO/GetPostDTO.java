@@ -15,4 +15,5 @@ public class GetPostDTO {
     private Long likes;
     private String title;
     private String pathToPhoto;
+    private String text;
 }

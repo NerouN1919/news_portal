@@ -2,9 +2,7 @@ package com.portal.news.Services;
 
 import com.portal.news.DAO.CommentsDAO;
 import com.portal.news.DTO.AddCommentDTO;
-import com.portal.news.DTO.GetCommentDTO;
-import com.portal.news.DTO.HowManyCommentsDTO;
-import com.portal.news.DTO.ReturnedCommentDTO;
+import com.portal.news.DTO.HowManyDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -22,11 +20,11 @@ public class CommentsService {
         commentsDAO.addComment(addCommentDTO);
     }
     @Transactional
-    public ResponseEntity<List<ReturnedCommentDTO>> getComments(GetCommentDTO getCommentDTO){
-        return commentsDAO.getComments(getCommentDTO);
+    public ResponseEntity<List<?>> getComments(Long from, Long howMany, Long postId){
+        return commentsDAO.getComments(from, howMany, postId);
     }
     @Transactional
-    public ResponseEntity<HowManyCommentsDTO> howManyComments(Long id){
+    public ResponseEntity<HowManyDTO> howManyComments(Long id){
         return commentsDAO.howManyComments(id);
     }
 }

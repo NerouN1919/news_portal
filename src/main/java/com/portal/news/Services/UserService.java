@@ -16,7 +16,7 @@ public class UserService {
     private UserDAO userDAO;
     @Transactional
     public ResponseEntity<IdDTO> registration(RegDTO regDTO){
-        return userDAO.registartion(regDTO);
+        return userDAO.registration(regDTO);
     }
     @Transactional
     public ResponseEntity<IdDTO> login(LoginDTO loginDTO){

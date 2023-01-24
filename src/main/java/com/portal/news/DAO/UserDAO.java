@@ -18,6 +18,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.regex.Pattern;
 
 @Repository
 public class UserDAO {
@@ -25,8 +26,17 @@ public class UserDAO {
     private EntityManager entityManager;
     @Autowired
     private PasswordEncoder passwordEncoder;
-    public ResponseEntity<IdDTO> registartion(@NotNull RegDTO regDTO){
+    public ResponseEntity<IdDTO> registration(RegDTO regDTO){
         Session session = entityManager.unwrap(Session.class);
+        if(!Pattern.matches("^[A-Z][a-zA-Z]+$", regDTO.getName())){
+            throw new Failed("Bad name");
+        }
+        if(!Pattern.matches("^[A-Z][a-zA-Z]+$", regDTO.getSurname())){
+            throw new Failed("Bad surname");
+        }
+        if(!Pattern.matches("^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\\.[a-zA-Z0-9-.]+$", regDTO.getEmail())){
+            throw new Failed("Bad email");
+        }
         List<Users> isIn = session.createQuery("from Users where email='"+regDTO.getEmail()+"'",
                 Users.class).getResultList();
         if(isIn.size()==0){
@@ -37,7 +47,7 @@ public class UserDAO {
         }
         throw new Failed("Exists this email");
     }
-    public ResponseEntity<IdDTO> login(@NotNull LoginDTO loginDTO){
+    public ResponseEntity<IdDTO> login(LoginDTO loginDTO){
         Session session = entityManager.unwrap(Session.class);
         List<Users> need = session.createQuery("from Users where email='"+loginDTO.getEmail()+"'",
                 Users.class).getResultList();

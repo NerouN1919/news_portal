@@ -23,6 +23,8 @@ public class Posts {
     private Long like;
     @Column(name = "pathToPhoto")
     private String pathToPhoto;
+    @Column(name = "hrefToText")
+    private String hrefToText;
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL)
     private List<Comments> comments = new ArrayList<>();
     @Column(name = "title")
@@ -34,6 +36,11 @@ public class Posts {
         this.pathToPhoto = pathToPhoto;
         this.title = title;
     }
+
+    public Posts(Long id) {
+        this.id = id;
+    }
+
     public void addComment(Comments comments, Users users){
         comments.setPost(this);
         comments.setUser(users);

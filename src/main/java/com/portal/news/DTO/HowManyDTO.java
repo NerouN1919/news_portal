@@ -5,8 +5,6 @@ import lombok.Data;
 
 @Data
 @AllArgsConstructor
-public class AddPostDTO {
-    private String title;
-    private String text;
-    private String imagePath;
+public class HowManyDTO {
+    private Long size;
 }
