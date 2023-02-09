@@ -10,7 +10,6 @@ import com.portal.news.DTO.UserInfoDTO;
 import com.portal.news.DataBase.Users;
 import com.portal.news.Errors.Failed;
 import org.hibernate.Session;
-import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -26,6 +25,7 @@ public class UserDAO {
     private EntityManager entityManager;
     @Autowired
     private PasswordEncoder passwordEncoder;
+
     public ResponseEntity<IdDTO> registration(RegDTO regDTO){
         Session session = entityManager.unwrap(Session.class);
         if(!Pattern.matches("^[A-Z][a-zA-Z]+$", regDTO.getName())){

@@ -1,6 +1,8 @@
 package com.portal.news.DataBase;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -11,6 +13,8 @@ import java.util.Objects;
 @Entity
 @Table(name = "comments")
 @Data
+@Builder
+@AllArgsConstructor
 @NoArgsConstructor
 public class Comments {
     @Id

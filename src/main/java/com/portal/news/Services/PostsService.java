@@ -16,13 +16,13 @@ import java.util.List;
 public class PostsService {
     @Autowired
     private PostsDAO postsDAO;
-    public ResponseEntity<Posts> addPost(AddPostDTO addPostDTO) throws IOException {
+    public ResponseEntity<GetPostDTO> addPost(AddPostDTO addPostDTO) throws IOException {
         return postsDAO.addPost(addPostDTO);
     }
     public ResponseEntity<UploadDTO> uploadImageToPost(MultipartFile multipartFile) throws IOException {
         return postsDAO.uploadImageToPost(multipartFile);
     }
-    public ResponseEntity<?> downloadImage(String fileCode){
+    public ResponseEntity<Object> downloadImage(String fileCode){
         return postsDAO.downloadImage(fileCode);
     }
     @Transactional

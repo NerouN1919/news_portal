@@ -19,7 +19,7 @@ public class PostsController {
     @Autowired
     private PostsService postsService;
     @PostMapping("/addPost")
-    public ResponseEntity<Posts> addPost(@RequestBody AddPostDTO addPostDTO) throws IOException {
+    public ResponseEntity<GetPostDTO> addPost(@RequestBody AddPostDTO addPostDTO) throws IOException {
         return postsService.addPost(addPostDTO);
     }
     @PostMapping("/uploadImageToPost")
@@ -27,7 +27,7 @@ public class PostsController {
         return postsService.uploadImageToPost(multipartFile);
     }
     @GetMapping("/downloadImage/{fileCode}")
-    public ResponseEntity<?> downloadImage(@PathVariable("fileCode") String fileCode) {
+    public ResponseEntity<Object> downloadImage(@PathVariable("fileCode") String fileCode) {
         return postsService.downloadImage(fileCode);
     }
     @PutMapping("/like")

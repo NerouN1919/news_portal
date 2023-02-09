@@ -3,6 +3,7 @@ package com.portal.news.DataBase;
 import javax.persistence.*;
 
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -12,6 +13,7 @@ import java.util.List;
 @Data
 @Table(name="Gusers")
 @Entity
+@Builder
 @AllArgsConstructor
 @NoArgsConstructor
 public class Users {
@@ -33,7 +35,7 @@ public class Users {
             joinColumns = @JoinColumn(name = "user_id"),
             inverseJoinColumns = @JoinColumn(name = "post_id"))
     List<Posts> likedPosts = new ArrayList<>();
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "user")
+    @OneToMany(cascade = CascadeType.MERGE, mappedBy = "user")
     private List<Comments> users = new ArrayList<>();
     public void addComment(Comments comments){
         comments.setUser(this);

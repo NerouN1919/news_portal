@@ -47,7 +47,7 @@ public class CommentsDAO {
         Session session = entityManager.unwrap(Session.class);
         Posts posts = session.get(Posts.class, id);
         if (posts == null){
-            throw new Failed("Not such post");
+            throw new Failed("Doesnt have such post");
         }
         return new ResponseEntity<>(new HowManyDTO((long) posts.getComments().size()), HttpStatus.OK);
     }
@@ -74,7 +74,7 @@ public class CommentsDAO {
             from = session.createQuery("select a from Comments a order by a.id desc ", Comments.class)
                     .setMaxResults(1).getResultList().get(0).getId();
         }
-        List<Comments> list = getListForGetComments(session, from, howMuch, postId);
+        List<Comments> list = getListForGetComments(session, from, howMuch-1, postId);
         long beforeHowMuch = howMuch;
         while(list.size()!=beforeHowMuch){
             howMuch++;
@@ -100,6 +100,7 @@ public class CommentsDAO {
         } catch (IndexOutOfBoundsException e){
             result.add(new IdForNextDTO(null));
         }
+
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
 }

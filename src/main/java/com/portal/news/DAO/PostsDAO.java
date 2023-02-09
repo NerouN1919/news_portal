@@ -5,7 +5,6 @@ import com.portal.news.DataBase.Posts;
 import com.portal.news.DataBase.Users;
 import com.portal.news.Errors.Failed;
 import com.portal.news.FileWork.FileDownloadUtil;
-import com.portal.news.FileWork.FileUploadResponse;
 import com.portal.news.FileWork.FileUploadUtil;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.hibernate.Session;
@@ -24,21 +23,19 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 @Repository
 public class PostsDAO {
     @Autowired
     private EntityManager entityManager;
-    public ResponseEntity<Posts> addPost(AddPostDTO addPostDTO) throws IOException{
+    public ResponseEntity<GetPostDTO> addPost(AddPostDTO addPostDTO) throws IOException{
         Session session = entityManager.unwrap(Session.class);
         if(addPostDTO.getTitle().length() < 5 || addPostDTO.getTitle().length() > 1000){
             throw new Failed("Wrong length of title");
         }
-        Posts posts = new Posts(addPostDTO.getImagePath(), addPostDTO.getTitle());String fileCode = RandomStringUtils.randomAlphanumeric(25);
+        Posts posts = new Posts(addPostDTO.getImagePath(), addPostDTO.getTitle());
+        String fileCode = RandomStringUtils.randomAlphanumeric(25);
         List<String> parts = Arrays.asList(addPostDTO.getText().split("\n"));
         Path uploadPath = Paths.get("Posts");
         if (!Files.exists(uploadPath)) {
@@ -48,44 +45,41 @@ public class PostsDAO {
         Files.write(filePath, parts);
         posts.setHrefToText(fileCode);
         session.save(posts);
-        return new ResponseEntity<>(posts, HttpStatus.OK);
+        return getPost(posts.getId());
     }
-    public ResponseEntity<?> downloadImage(String fileCode) {
+    public ResponseEntity<Object> downloadImage(String fileCode) {
         FileDownloadUtil downloadUtil = new FileDownloadUtil();
-
         Resource resource = null;
         try {
             resource = downloadUtil.getFileAsResource(fileCode, "Images");
         } catch (IOException e) {
             return ResponseEntity.internalServerError().build();
         }
-
         if (resource == null) {
-            return new ResponseEntity<>("File not found", HttpStatus.NOT_FOUND);
+            throw new Failed("File not found");
         }
-
         String contentType = "application/octet-stream";
         String headerValue = "attachment; filename=\"" + resource.getFilename() + "\"";
-
         return ResponseEntity.ok()
                 .contentType(MediaType.parseMediaType(contentType))
                 .header(HttpHeaders.CONTENT_DISPOSITION, headerValue)
                 .body(resource);
     }
     public ResponseEntity<UploadDTO> uploadImageToPost(MultipartFile multipartFile) throws IOException {
-        String fileName = StringUtils.cleanPath(multipartFile.getOriginalFilename());
-        long size = multipartFile.getSize();
+        String fileName = StringUtils.cleanPath(Objects.requireNonNull(multipartFile.getOriginalFilename()));
         String filecode = FileUploadUtil.saveFile(fileName, multipartFile, "Images");
-        FileUploadResponse response = new FileUploadResponse();
-        response.setFileName(fileName);
-        response.setSize(size);
-        response.setDownloadUri("/downloadFile/" + filecode);
         return new ResponseEntity<>(new UploadDTO(filecode), HttpStatus.OK);
     }
     public ResponseEntity<ResultLikeDTO> like(LikeDTO likeDTO){
         Session session = entityManager.unwrap(Session.class);
         Users users = session.get(Users.class, likeDTO.getUser_id());
+        if(users == null){
+            throw new Failed("Doesnt have such user");
+        }
         Posts posts = session.get(Posts.class, likeDTO.getPost_id());
+        if(posts == null){
+            throw new Failed("Doesnt have such post");
+        }
         for(Posts in : users.getLikedPosts()){
             if(in.equals(posts)){
                 throw new Failed("Already liked");
@@ -100,7 +94,13 @@ public class PostsDAO {
     public ResponseEntity<ResultLikeDTO> unlike(LikeDTO likeDTO){
         Session session = entityManager.unwrap(Session.class);
         Users users = session.get(Users.class, likeDTO.getUser_id());
+        if(users == null){
+            throw new Failed("Doesnt have such user");
+        }
         Posts posts = session.get(Posts.class, likeDTO.getPost_id());
+        if(posts == null){
+            throw new Failed("Doesnt have such post");
+        }
         boolean find = false;
         for(Posts in : users.getLikedPosts()){
             if(in.equals(posts)){
@@ -119,11 +119,14 @@ public class PostsDAO {
     public ResponseEntity<GetPostDTO> getPost(Long id){
         Session session = entityManager.unwrap(Session.class);
         Posts posts = session.get(Posts.class, id);
+        if(posts == null){
+            throw new Failed("Doesnt have such post");
+        }
         String content;
         try {
             content = Files.readString(Paths.get("Posts\\"+posts.getHrefToText()+".txt"));
         } catch (IOException e){
-            throw new Failed("No such file");
+            throw new Failed("Invalid post");
         }
         return new ResponseEntity<GetPostDTO>(new GetPostDTO(posts.getId(), posts.getDate(), posts.getLike(),
                 posts.getTitle(), posts.getPathToPhoto(), content), HttpStatus.OK);
@@ -134,7 +137,8 @@ public class PostsDAO {
                 .getResultList().size()), HttpStatus.OK);
     }
     List<Posts> getPostsList(Session session, long from, long howMuch){
-        return session.createQuery("select e from Posts e where e.id >= :first and e.id < :second order by e.id desc", Posts.class)
+        return session.createQuery("select e from Posts e where e.id >= :first and e.id < :second " +
+                        "order by e.id desc", Posts.class)
                 .setParameter("first", from)
                 .setParameter("second", from+howMuch)
                 .getResultList();
