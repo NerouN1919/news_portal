@@ -19,4 +19,6 @@ password : **12345**
 ## Просмотр документации по использованию REST API
   
 В браузере ввести: http://localhost:8080/swagger-ui/index.html  
+##Диаграмма базы данных  
+![изображение](https://user-images.githubusercontent.com/99546572/218124166-d4042d32-0ba8-451d-be9d-89ec64dea733.png)
 
