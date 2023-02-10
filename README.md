@@ -7,7 +7,8 @@
 - docker compose up -d  
 ## Для запуска приложения в IDE  
 **Изменить docker-compose.yml**  
-```version: '3.1'
+```
+version: '3.1'
 volumes:
   pg_timeweb:
 services:
@@ -19,7 +20,8 @@ services:
       - POSTGRES_USER=admin
       - POSTGRES_DB=hack
     ports:
-      - 5455:5432```  
+      - 5455:5432
+```  
       
 ## Получение и работа с JWT  
 Для получения сделать POST запрос: "http://localhost:8080/api/auth/login"  
