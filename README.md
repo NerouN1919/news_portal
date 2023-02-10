@@ -4,7 +4,7 @@
   
 В PowerShell вписать: 
 - `docker compose build` 
-- `docker compose up -d`  
+- `docker compose up`  
 ## Для запуска приложения в IDE  
 **Изменить docker-compose.yml**  
 ```
