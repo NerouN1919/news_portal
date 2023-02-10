@@ -20,13 +20,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.util.LinkedMultiValueMap;
-import org.springframework.web.multipart.MultipartFile;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
@@ -90,11 +88,12 @@ public class PostsControllerTest {
     @Test
     @WithMockUser(roles = "ADMIN")
     public void getPostsTest_Status_Ok() throws Exception {
-        List<Object> result = List.of(new GetPostDTO(1L, new Date(), 0L, "Title",
-                "ImagePath", "Text"),
-                new GetPostDTO(2L, new Date(), 0L, "Title",
-                        "ImagePath", "Text"),
-                new IdForNextDTO(3L));
+        List<Object> result = new ArrayList<>();
+        result.add(new GetPostDTO(1L, new Date(), 0L, "Title",
+                "ImagePath", "Text"));
+        result.add(new GetPostDTO(2L, new Date(), 0L, "Title",
+                "ImagePath", "Text"));
+        result.add(new IdForNextDTO(3L));
         when(postsDAO.getPosts(0L, 2L)).thenReturn(new ResponseEntity<>(result, HttpStatus.OK));
         mockMvc.perform(get("/api/posts/getPosts/0/2"))
                 .andExpect(status().isOk())

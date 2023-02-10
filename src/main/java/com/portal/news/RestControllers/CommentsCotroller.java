@@ -14,6 +14,7 @@ import java.util.List;
 @RestController
 @PreAuthorize("hasAuthority('ADMIN')")
 @RequestMapping("/api/comments")
+@CrossOrigin
 public class CommentsCotroller {
     @Autowired
     private CommentsService commentsService;

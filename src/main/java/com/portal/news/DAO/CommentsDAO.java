@@ -18,6 +18,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Repository
 public class CommentsDAO {
@@ -85,7 +86,8 @@ public class CommentsDAO {
         for(Comments in: list){
             String content;
             try {
-                content = Files.readString(Paths.get("Comments\\"+in.getHrefToComment()+".txt"));
+                content = Files.lines(Paths.get("Comments\\"+in.getHrefToComment()+".txt"))
+                        .collect(Collectors.joining(System.lineSeparator()));
             } catch (IOException e){
                 throw new Failed("No such file");
             }

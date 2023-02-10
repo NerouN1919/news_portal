@@ -15,6 +15,7 @@ import java.util.List;
 @RestController
 @PreAuthorize("hasAuthority('ADMIN')")
 @RequestMapping("/api/posts")
+@CrossOrigin
 public class PostsController {
     @Autowired
     private PostsService postsService;

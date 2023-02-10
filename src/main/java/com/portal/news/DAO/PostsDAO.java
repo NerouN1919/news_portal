@@ -24,6 +24,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Repository
 public class PostsDAO {
@@ -124,7 +126,8 @@ public class PostsDAO {
         }
         String content;
         try {
-            content = Files.readString(Paths.get("Posts\\"+posts.getHrefToText()+".txt"));
+            content = Files.lines(Paths.get("Posts\\"+posts.getHrefToText()+".txt"))
+                    .collect(Collectors.joining(System.lineSeparator()));
         } catch (IOException e){
             throw new Failed("Invalid post");
         }
@@ -133,12 +136,19 @@ public class PostsDAO {
     }
     public ResponseEntity<HowManyDTO> howManyPosts(){
         Session session = entityManager.unwrap(Session.class);
-        return new ResponseEntity<>(new HowManyDTO((long)session.createQuery("select a from Posts a")
+        Calendar cal2 = Calendar.getInstance();
+        cal2.add(Calendar.DAY_OF_YEAR, -1);
+        Date dt2 = new Date(cal2.getTimeInMillis());
+        return new ResponseEntity<>(new HowManyDTO((long)session.createQuery("select a from Posts a where date>=:date").setParameter("date", dt2)
                 .getResultList().size()), HttpStatus.OK);
     }
     List<Posts> getPostsList(Session session, long from, long howMuch){
+        Calendar cal2 = Calendar.getInstance();
+        cal2.add(Calendar.DAY_OF_YEAR, -1);
+        Date dt2 = new Date(cal2.getTimeInMillis());
         return session.createQuery("select e from Posts e where e.id >= :first and e.id < :second " +
-                        "order by e.id desc", Posts.class)
+                        "and e.date >= :date order by e.id desc", Posts.class)
+                .setParameter("date", dt2)
                 .setParameter("first", from)
                 .setParameter("second", from+howMuch)
                 .getResultList();
@@ -150,7 +160,12 @@ public class PostsDAO {
         Session session = entityManager.unwrap(Session.class);
         List<Posts> list = getPostsList(session, from, howMuch);
         long howMuchBefore = howMuch;
-        long last = session.createQuery("select a from Posts a order by a.id desc ", Posts.class)
+        Calendar cal2 = Calendar.getInstance();
+        cal2.add(Calendar.DAY_OF_YEAR, -1);
+        Date dt2 = new Date(cal2.getTimeInMillis());
+        long last = session.createQuery("select a from Posts a where a.date >= :date order by a.id desc",
+                        Posts.class)
+                .setParameter("date", dt2)
                 .setMaxResults(1).getResultList().get(0).getId();
         while (list.size() != howMuchBefore){
             if(from+howMuch>last){
@@ -164,7 +179,8 @@ public class PostsDAO {
         for(Posts in : list){
             String content;
             try {
-                content = Files.readString(Paths.get("Posts\\"+in.getHrefToText()+".txt"));
+                content = Files.lines(Paths.get("Posts\\"+in.getHrefToText()+".txt"))
+                        .collect(Collectors.joining(System.lineSeparator()));
             } catch (IOException e){
                 throw new Failed("No such file");
             }

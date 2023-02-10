@@ -21,6 +21,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
@@ -59,7 +60,7 @@ public class CommentsControllerTest {
     @Test
     @WithMockUser(roles = "ADMIN")
     public void GetCommentsTest_Status_Ok() throws Exception {
-        List<?> response = List.of(new ReturnedCommentDTO("CommentFirst", 1L, 1L, new Date()),
+        List<?> response = Arrays.asList(new ReturnedCommentDTO("CommentFirst", 1L, 1L, new Date()),
                 new ReturnedCommentDTO("CommentSecond", 1L, 2L, new Date()),
                 new IdForNextDTO(1L));
         when(commentsDAO.getComments(0L, 2L, 1L)).thenReturn(

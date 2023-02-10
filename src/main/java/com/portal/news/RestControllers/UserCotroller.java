@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @PreAuthorize("hasAuthority('ADMIN')")
 @RequestMapping("/api/users")
+@CrossOrigin
 public class UserCotroller {
     @Autowired
     private UserService userService;

@@ -18,7 +18,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Repository;
 import org.springframework.test.annotation.DirtiesContext;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -45,7 +44,7 @@ public class PostsDaoTest {
         Assertions.assertEquals(getPostDTO.getId(), 1L);
         Assertions.assertEquals(getPostDTO.getLikes(), 0L);
         Assertions.assertEquals(getPostDTO.getTitle(), "title");
-        Assertions.assertEquals(getPostDTO.getText(), "text\r\n");
+        Assertions.assertEquals(getPostDTO.getText(), "text");
         Assertions.assertEquals(getPostDTO.getPathToPhoto(), "imagePath");
     }
     @Test
@@ -142,7 +141,7 @@ public class PostsDaoTest {
         postsDAO.like(new LikeDTO(1L, 1L));
         GetPostDTO getPostDTO = postsDAO.getPost(1L).getBody();
         assert getPostDTO != null;
-        Assertions.assertEquals(getPostDTO.getText(), "text\r\n");
+        Assertions.assertEquals(getPostDTO.getText(), "text");
         Assertions.assertEquals(getPostDTO.getPathToPhoto(), "imagePath");
         Assertions.assertEquals(getPostDTO.getId(), 1L);
         Assertions.assertEquals(getPostDTO.getTitle(), "title");

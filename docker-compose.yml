@@ -1,13 +1,24 @@
-version: '3.1'
-volumes:
-  pg_timeweb:
+version: '3.7'
 services:
-  pg_db:
+  app:
+    image: 'news-portal'
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: app
+    depends_on:
+      - db
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/portal
+      - SPRING_DATASOURCE_USERNAME=admin
+      - SPRING_DATASOURCE_PASSWORD=admin
+      - SPRING_JPA_HIBERNATE_DDL_AUTO=update
+    ports:
+      - 8080:8080
+  db:
     image: 'postgres:latest'
     restart: always
     environment:
       - POSTGRES_PASSWORD=admin
       - POSTGRES_USER=admin
       - POSTGRES_DB=portal
-    ports:
-      - 5455:5432
