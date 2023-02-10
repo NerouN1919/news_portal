@@ -46,6 +46,7 @@ password : **12345**
   - Spring Data JPA
   - Spring MVC
   - Spring Security
+  - Hibernate
   - JWT-api
   - Jackson
   - PostgreSQL    
