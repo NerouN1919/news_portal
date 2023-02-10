@@ -46,11 +46,11 @@ password : **12345**
   - Spring Security
   - JWT-api
   - Jackson
-  - PostgreSQL  
+  - PostgreSQL    
 Используемый стек технологий для тестирования:
   - JUnit
   - Mockito
-  - H2 database  
+  - H2 database    
 Используемые технологии для запуска:
   - Docker(docker compose)
   
