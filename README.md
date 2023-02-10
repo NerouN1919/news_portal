@@ -44,6 +44,7 @@ password : **12345**
 Используемый стек технологий:  
   - Java 8
   - Spring Data JPA
+  - Spring MVC
   - Spring Security
   - JWT-api
   - Jackson
