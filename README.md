@@ -18,7 +18,7 @@ services:
     environment:
       - POSTGRES_PASSWORD=admin
       - POSTGRES_USER=admin
-      - POSTGRES_DB=hack
+      - POSTGRES_DB=portal
     ports:
       - 5455:5432
 ```  
