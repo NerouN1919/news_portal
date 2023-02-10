@@ -22,6 +22,9 @@ services:
     ports:
       - 5455:5432
 ```  
+И выполнить в директории проекта в PowerShell:
+  - `docker compose build` 
+  - `docker compose up`  
       
 ## Получение и работа с JWT  
 Для получения сделать POST запрос: "http://localhost:8080/api/auth/login"  
