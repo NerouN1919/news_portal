@@ -11,7 +11,6 @@ import java.util.*;
 @Entity
 @Table(name = "posts")
 @Data
-@Builder
 @AllArgsConstructor
 @NoArgsConstructor
 public class Posts {
@@ -37,10 +36,6 @@ public class Posts {
         like = (long)0;
         this.pathToPhoto = pathToPhoto;
         this.title = title;
-    }
-
-    public Posts(Long id) {
-        this.id = id;
     }
 
     public void addComment(Comments comments, Users users){

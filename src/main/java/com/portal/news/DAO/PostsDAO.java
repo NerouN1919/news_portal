@@ -25,7 +25,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 @Repository
 public class PostsDAO {
@@ -139,7 +138,8 @@ public class PostsDAO {
         Calendar cal2 = Calendar.getInstance();
         cal2.add(Calendar.DAY_OF_YEAR, -1);
         Date dt2 = new Date(cal2.getTimeInMillis());
-        return new ResponseEntity<>(new HowManyDTO((long)session.createQuery("select a from Posts a where date>=:date").setParameter("date", dt2)
+        return new ResponseEntity<>(new HowManyDTO((long)session.createQuery("select a from Posts a " +
+                        "where date>=:date").setParameter("date", dt2)
                 .getResultList().size()), HttpStatus.OK);
     }
     List<Posts> getPostsList(Session session, long from, long howMuch){

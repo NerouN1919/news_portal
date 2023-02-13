@@ -13,7 +13,6 @@ import java.util.Objects;
 @Entity
 @Table(name = "comments")
 @Data
-@Builder
 @AllArgsConstructor
 @NoArgsConstructor
 public class Comments {

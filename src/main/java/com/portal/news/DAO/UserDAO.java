@@ -37,8 +37,8 @@ public class UserDAO {
         if(!Pattern.matches("^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\\.[a-zA-Z0-9-.]+$", regDTO.getEmail())){
             throw new Failed("Bad email");
         }
-        List<Users> isIn = session.createQuery("from Users where email='"+regDTO.getEmail()+"'",
-                Users.class).getResultList();
+        List<Users> isIn = session.createQuery("select a from Users a where a.email=:email",
+                Users.class).setParameter("email", regDTO.getEmail()).getResultList();
         if(isIn.size()==0){
             Users users = new Users(regDTO.getName(), regDTO.getSurname(),
                     passwordEncoder.encode(regDTO.getPasswordHash()),regDTO.getEmail());
@@ -49,8 +49,8 @@ public class UserDAO {
     }
     public ResponseEntity<IdDTO> login(LoginDTO loginDTO){
         Session session = entityManager.unwrap(Session.class);
-        List<Users> need = session.createQuery("from Users where email='"+loginDTO.getEmail()+"'",
-                Users.class).getResultList();
+        List<Users> need = session.createQuery("select a from Users a where a.email=:email",
+                Users.class).setParameter("email", loginDTO.getEmail()).getResultList();
         if(need.size()==0){
             throw new Failed("Dont have such email");
         }
