@@ -28,6 +28,7 @@ services:
   - `docker compose up`  
       
 ## Получение и работа с JWT  
+**Время жизни токена - 5 минут**  
 Для получения сделать POST запрос: "http://localhost:8080/api/auth/login"  
 Тело запроса смотреть в документации к API    
 login : **SviridenkoAdmin**  
