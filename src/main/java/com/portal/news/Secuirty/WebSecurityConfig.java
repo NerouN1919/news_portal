@@ -31,8 +31,7 @@ public class WebSecurityConfig {
                                 .anyRequest().authenticated()
                                 .and()
                                 .addFilterAfter(jwtFilter, UsernamePasswordAuthenticationFilter.class)
-                )
-            .cors(cors -> cors.disable()).build();
+                ).cors(cors -> cors.disable()).build();
     }
 
 }
