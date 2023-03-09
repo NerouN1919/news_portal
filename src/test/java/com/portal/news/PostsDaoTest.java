@@ -63,6 +63,7 @@ public class PostsDaoTest {
         postsDAO.addPost(new AddPostDTO("title", "text", "imagePath"));
         userDAO.registration(new RegDTO("Name", "Surname", "email@mail.ru", "password"));
         ResultLikeDTO resultLikeDTO = postsDAO.like(new LikeDTO(1L, 1L)).getBody();
+        assert resultLikeDTO != null;
         Assertions.assertEquals(resultLikeDTO.getLikes(), 1L);
         Assertions.assertEquals(resultLikeDTO.getPost_id(), 1L);
     }
@@ -102,6 +103,7 @@ public class PostsDaoTest {
         userDAO.registration(new RegDTO("Name", "Surname", "email@mail.ru", "password"));
         postsDAO.like(new LikeDTO(1L, 1L));
         ResultLikeDTO resultLikeDTO = postsDAO.unlike(new LikeDTO(1L, 1L)).getBody();
+        assert resultLikeDTO != null;
         Assertions.assertEquals(resultLikeDTO.getLikes(), 0L);
         Assertions.assertEquals(resultLikeDTO.getPost_id(), 1L);
     }
@@ -139,20 +141,21 @@ public class PostsDaoTest {
         postsDAO.addPost(new AddPostDTO("title", "text", "imagePath"));
         userDAO.registration(new RegDTO("Name", "Surname", "email@mail.ru", "password"));
         postsDAO.like(new LikeDTO(1L, 1L));
-        GetPostDTO getPostDTO = postsDAO.getPost(1L).getBody();
+        GetPostDTO getPostDTO = postsDAO.getPost(1L, 1L).getBody();
         assert getPostDTO != null;
         Assertions.assertEquals(getPostDTO.getText(), "text");
         Assertions.assertEquals(getPostDTO.getPathToPhoto(), "imagePath");
         Assertions.assertEquals(getPostDTO.getId(), 1L);
         Assertions.assertEquals(getPostDTO.getTitle(), "title");
         Assertions.assertEquals(getPostDTO.getLikes(), 1L);
+        Assertions.assertTrue(getPostDTO.getIsLiked());
     }
     @Test
     public void getPostBadRequest() throws IOException {
         postsDAO.addPost(new AddPostDTO("title", "text", "imagePath"));
         boolean isSuccess = false;
         try {
-            postsDAO.getPost(4L);
+            postsDAO.getPost(4L, 0L);
         } catch (Failed e) {
             Assertions.assertEquals(e.getMessage(), "Doesnt have such post");
             isSuccess = true;
@@ -174,10 +177,10 @@ public class PostsDaoTest {
         postsDAO.addPost(addPostDTO);
         postsDAO.addPost(addPostDTO);
         postsDAO.addPost(addPostDTO);
-        List<?> list = postsDAO.getPosts(0L, 2L).getBody();
+        List<?> list = postsDAO.getPosts(0L, 2L, 0L).getBody();
         assert list != null;
         assert list.size() == 3;
-        Assertions.assertEquals((GetPostDTO)list.get(0), postsDAO.getPost(1L).getBody());
+        Assertions.assertEquals((GetPostDTO)list.get(0), postsDAO.getPost(1L, 0L).getBody());
         Assertions.assertEquals((IdForNextDTO)list.get(2), new IdForNextDTO(3L));
     }
     @Test
@@ -188,7 +191,7 @@ public class PostsDaoTest {
         postsDAO.addPost(addPostDTO);
         boolean isSuccess = false;
         try {
-            postsDAO.getPosts(0L, 10L);
+            postsDAO.getPosts(0L, 10L, 0L);
         } catch (Failed e) {
             Assertions.assertEquals(e.getMessage(), "No have so many posts");
             isSuccess = true;
@@ -196,7 +199,7 @@ public class PostsDaoTest {
         Assertions.assertTrue(isSuccess);
          isSuccess = false;
          try {
-             postsDAO.getPosts(-1L, 2L);
+             postsDAO.getPosts(-1L, 2L, 0L);
          } catch (Failed e) {
              Assertions.assertEquals(e.getMessage(), "Bad from id");
              isSuccess = true;
@@ -218,9 +221,11 @@ public class PostsDaoTest {
         MockMultipartFile multipartFile = new MockMultipartFile("file", "filename.jpg", "image/jpeg", "some xml".getBytes());
         UploadDTO uploadDTO = postsDAO.uploadImageToPost(multipartFile).getBody();
         Path uploadPath = Paths.get("Images");
+        assert uploadDTO != null;
         Path filePath = uploadPath.resolve(uploadDTO.getPath()+"-filename.jpg");
         Resource resource = (Resource) postsDAO.downloadImage(uploadDTO.getPath()).getBody();
-        Assertions.assertEquals(filePath.getFileName().toString(), resource.getFilename().toString());
+        assert resource != null;
+        Assertions.assertEquals(filePath.getFileName().toString(), resource.getFilename());
     }
     @Test
     public void downloadImageBadRequest() throws IOException {

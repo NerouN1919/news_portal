@@ -33,12 +33,12 @@ public class PostsService {
         return postsDAO.unlike(likeDTO);
     }
     @Transactional
-    public ResponseEntity<GetPostDTO> getPost(Long id){
-        return postsDAO.getPost(id);
+    public ResponseEntity<GetPostDTO> getPost(Long post_id, Long user_id){
+        return postsDAO.getPost(post_id, user_id);
     }
     @Transactional
-    public ResponseEntity<List<?>> getPosts(Long from, Long howMuch){
-        return postsDAO.getPosts(from, howMuch);
+    public ResponseEntity<List<?>> getPosts(Long from, Long howMuch, Long user_id){
+        return postsDAO.getPosts(from, howMuch, user_id);
     }
     @Transactional
     public ResponseEntity<HowManyDTO> howManyPosts(){

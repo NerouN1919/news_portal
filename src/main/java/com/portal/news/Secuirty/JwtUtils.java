@@ -11,7 +11,7 @@ import java.util.stream.Collectors;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class JwtUtils {
 
-    public static JwtAuthentication generate(Claims claims) {
+    public static JwtAuthentication generate(Claims claims) { //Генерация токена
         final JwtAuthentication jwtInfoToken = new JwtAuthentication();
         jwtInfoToken.setRoles(getRoles(claims));
         jwtInfoToken.setFirstName(claims.get("login", String.class));
@@ -19,7 +19,7 @@ public final class JwtUtils {
         return jwtInfoToken;
     }
 
-    private static Set<Role> getRoles(Claims claims) {
+    private static Set<Role> getRoles(Claims claims) { //Получение ролей доступа
         final List<String> roles = claims.get("roles", List.class);
         return roles.stream()
                 .map(Role::valueOf)

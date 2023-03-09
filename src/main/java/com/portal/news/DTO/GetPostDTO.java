@@ -16,4 +16,5 @@ public class GetPostDTO {
     private String title;
     private String pathToPhoto;
     private String text;
+    private Boolean isLiked;
 }

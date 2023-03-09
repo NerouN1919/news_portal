@@ -24,11 +24,11 @@ import java.util.stream.Collectors;
 public class CommentsDAO {
     @Autowired
     private EntityManager entityManager;
-    public void addComment(AddCommentDTO addCommentDTO) throws IOException {
+    public void addComment(AddCommentDTO addCommentDTO) throws IOException { //Добавление комментария к посту
         Session session = entityManager.unwrap(Session.class);
         Posts posts = session.get(Posts.class, addCommentDTO.getPostId());
         Users users = session.get(Users.class, addCommentDTO.getUserId());
-        if(posts == null || users == null){
+        if(posts == null || users == null){ //Проверка на наличие поста и пользователя
             throw new Failed("No such post or user");
         }
         String fileCode = RandomStringUtils.randomAlphanumeric(25);
@@ -38,21 +38,21 @@ public class CommentsDAO {
             Files.createDirectories(uploadPath);
         }
         Path filePath = uploadPath.resolve(fileCode+".txt");
-        Files.write(filePath, parts);
+        Files.write(filePath, parts); //Создание и запись в файл текст комментария
         Comments comments = new Comments(fileCode);
         posts.addComment(comments, users);
         session.save(posts);
         session.save(comments);
     }
-    public ResponseEntity<HowManyDTO> howManyComments(Long id){
+    public ResponseEntity<HowManyDTO> howManyComments(Long id){ //Получение инормации о том, сколько комментарив
         Session session = entityManager.unwrap(Session.class);
         Posts posts = session.get(Posts.class, id);
-        if (posts == null){
+        if (posts == null){ //Проверка на наличие поста
             throw new Failed("Doesnt have such post");
         }
         return new ResponseEntity<>(new HowManyDTO((long) posts.getComments().size()), HttpStatus.OK);
     }
-    private List<Comments> getListForGetComments(Session session, Long from, Long howMuch, Long postId){
+    private List<Comments> getListForGetComments(Session session, Long from, Long howMuch, Long postId){ //Запрос для получения списка комментариев из бд
         return session.createQuery("select e from Comments e where e.id >= :first " +
                         "and e.id <= :second and e.post = :third", Comments.class)
                 .setParameter("first", from-howMuch)
@@ -60,16 +60,16 @@ public class CommentsDAO {
                 .setParameter("third", session.get(Posts.class, postId))
                 .getResultList();
     }
-    public ResponseEntity<List<?>> getComments(Long from, Long howMuch, Long postId){
-        if(from < 0){
+    public ResponseEntity<List<?>> getComments(Long from, Long howMuch, Long postId){ //Получение списка комментариев
+        if(from < 0){ //Проверка на корректность id
             throw new Failed("Bad from id");
         }
-        if(howMuch < 0){
+        if(howMuch < 0){ //Проверка на корректность числа комментариев
             throw new Failed("Bad howMuch");
         }
         Session session = entityManager.unwrap(Session.class);
         if(session.get(Posts.class, postId) == null){
-            throw new Failed("No such post");
+            throw new Failed("No such post"); //Проверка на наличие поста
         }
         if(from == 0){
             from = session.createQuery("select a from Comments a order by a.id desc ", Comments.class)
@@ -77,7 +77,7 @@ public class CommentsDAO {
         }
         List<Comments> list = getListForGetComments(session, from, howMuch-1, postId);
         long beforeHowMuch = howMuch;
-        while(list.size()!=beforeHowMuch){
+        while(list.size()!=beforeHowMuch){ //Проверка на пропусти в базе данных
             howMuch++;
             list = getListForGetComments(session, from, howMuch, postId);
         }
@@ -89,7 +89,7 @@ public class CommentsDAO {
                 content = Files.lines(Paths.get("Comments\\"+in.getHrefToComment()+".txt"))
                         .collect(Collectors.joining(System.lineSeparator()));
             } catch (IOException e){
-                throw new Failed("No such file");
+                throw new Failed("No such file"); //Проверка на наличие файла
             }
             result.add(new ReturnedCommentDTO(content, in.getPost().getId(), in.getUser().getId(), in.getDate()));
         }

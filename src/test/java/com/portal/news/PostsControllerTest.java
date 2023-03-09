@@ -12,7 +12,6 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.mock.mockito.SpyBean;
-import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -48,7 +47,7 @@ public class PostsControllerTest {
     public void AddPostTest_Status_Ok() throws Exception {
         AddPostDTO addPostDTO = new AddPostDTO("Title", "Text", "ImagePath");
         GetPostDTO getPostDTO = new GetPostDTO(1L, new Date(), 0L, "Title",
-                "ImagePath", "Text");
+                "ImagePath", "Text", null);
         when(postsDAO.addPost(addPostDTO)).thenReturn(new ResponseEntity<>(getPostDTO, HttpStatus.OK));
         mockMvc.perform(post("/api/posts/addPost")
                 .contentType("application/json")
@@ -64,11 +63,10 @@ public class PostsControllerTest {
     public void downloadImageTest_Status_Ok() throws Exception {
         String contentType = "application/octet-stream";
         String headerValue = "attachment; filename=\"Code";
-        Resource resource = null;
         ResponseEntity<Object> responseEntity = ResponseEntity.ok()
                 .contentType(MediaType.parseMediaType(contentType))
                 .header(HttpHeaders.CONTENT_DISPOSITION, headerValue)
-                .body(resource);
+                .body(null);
         when(postsDAO.downloadImage("Code")).thenReturn(responseEntity);
         mockMvc.perform(get("/api/posts/downloadImage/Code"))
                 .andExpect(status().isOk())
@@ -78,9 +76,9 @@ public class PostsControllerTest {
     @WithMockUser(roles = "ADMIN")
     public void getPostTest_Status_Ok() throws Exception {
         GetPostDTO getPostDTO = new GetPostDTO(1L, new Date(), 0L, "Title",
-                "ImagePath", "Text");
-        when(postsDAO.getPost(1L)).thenReturn(new ResponseEntity<>(getPostDTO, HttpStatus.OK));
-        mockMvc.perform(get("/api/posts/getPost/1"))
+                "ImagePath", "Text", false);
+        when(postsDAO.getPost(1L, 0L)).thenReturn(new ResponseEntity<>(getPostDTO, HttpStatus.OK));
+        mockMvc.perform(get("/api/posts/getPost/1/0"))
                 .andExpect(status().isOk())
                 .andExpect(content().json(objectMapper.writeValueAsString(getPostDTO)))
                 .andReturn();
@@ -90,12 +88,12 @@ public class PostsControllerTest {
     public void getPostsTest_Status_Ok() throws Exception {
         List<Object> result = new ArrayList<>();
         result.add(new GetPostDTO(1L, new Date(), 0L, "Title",
-                "ImagePath", "Text"));
+                "ImagePath", "Text", false));
         result.add(new GetPostDTO(2L, new Date(), 0L, "Title",
-                "ImagePath", "Text"));
+                "ImagePath", "Text", false));
         result.add(new IdForNextDTO(3L));
-        when(postsDAO.getPosts(0L, 2L)).thenReturn(new ResponseEntity<>(result, HttpStatus.OK));
-        mockMvc.perform(get("/api/posts/getPosts/0/2"))
+        when(postsDAO.getPosts(0L, 2L, 0L)).thenReturn(new ResponseEntity<>(result, HttpStatus.OK));
+        mockMvc.perform(get("/api/posts/getPosts/0/2/0"))
                 .andExpect(status().isOk())
                 .andExpect(content().json(objectMapper.writeValueAsString(result)))
                 .andReturn();

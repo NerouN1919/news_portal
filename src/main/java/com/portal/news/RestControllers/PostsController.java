@@ -39,13 +39,15 @@ public class PostsController {
     public ResponseEntity<ResultLikeDTO> unlike(@RequestBody LikeDTO likeDTO){
         return postsService.unlike(likeDTO);
     }
-    @GetMapping("/getPost/{id}")
-    public ResponseEntity<GetPostDTO> getPost(@PathVariable("id") Long id){
-        return postsService.getPost(id);
+    @GetMapping("/getPost/{post_id}/{user_id}")
+    public ResponseEntity<GetPostDTO> getPost(@PathVariable("post_id") Long post_id,
+                                              @PathVariable("user_id") Long user_id){
+        return postsService.getPost(post_id, user_id);
     }
-    @GetMapping("/getPosts/{from}/{howMuch}")
-    public ResponseEntity<List<?>> getPosts(@PathVariable("howMuch") Long howMuch, @PathVariable("from") Long from){
-        return postsService.getPosts(from, howMuch);
+    @GetMapping("/getPosts/{from}/{howMuch}/{user_id}")
+    public ResponseEntity<List<?>> getPosts(@PathVariable("howMuch") Long howMuch, @PathVariable("from") Long from,
+                                            @PathVariable("user_id") Long user_id){
+        return postsService.getPosts(from, howMuch, user_id);
     }
     @GetMapping("howMany")
     public ResponseEntity<HowManyDTO> howManyPosts(){

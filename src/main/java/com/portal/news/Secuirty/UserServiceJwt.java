@@ -16,7 +16,7 @@ public class UserServiceJwt {
     private final List<User> users;
 
     public UserServiceJwt() {
-        this.users = Arrays.asList(
+        this.users = Arrays.asList( //Аккаунта доступа в памяти
                 new User("SviridenkoUser", "1234", Collections.singleton(Role.USER)),
                 new User("MorozovUser", "1234", Collections.singleton(Role.USER)),
                 new User("SviridenkoAdmin", "12345", Collections.singleton(Role.ADMIN)),

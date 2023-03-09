@@ -16,6 +16,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Repository;
 import org.springframework.test.annotation.DirtiesContext;
 
+import java.util.Objects;
+
 @DataJpaTest(includeFilters = @ComponentScan.Filter(type = FilterType.ANNOTATION, classes = Repository.class))
 @DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
 @ComponentScan("com.portal.news")
@@ -101,8 +103,8 @@ public class UserDaoTest {
     @Test
     public void loginShouldReturnGood(){
         userDAO.registration(new RegDTO("First", "User", "first_user@mail.ru", "Password"));
-        Assertions.assertEquals(userDAO.login(new LoginDTO("first_user@mail.ru", "Password"))
-                .getBody().getId(), 1L);
+        Assertions.assertEquals(Objects.requireNonNull(userDAO.login(new LoginDTO("first_user@mail.ru", "Password"))
+                .getBody()).getId(), 1L);
     }
     @Test
     public void loginBadLogin(){

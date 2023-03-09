@@ -59,15 +59,15 @@ public class JwtProvider {
                 .compact();
     }
 
-    public boolean validateAccessToken(@NonNull String accessToken) {
+    public boolean validateAccessToken(@NonNull String accessToken) { //Валдиация токена доступа
         return validateToken(accessToken, jwtAccessSecret);
     }
 
-    public boolean validateRefreshToken(@NonNull String refreshToken) {
+    public boolean validateRefreshToken(@NonNull String refreshToken) { //Валидация токена обновления
         return validateToken(refreshToken, jwtRefreshSecret);
     }
 
-    private boolean validateToken(@NonNull String token, @NonNull Key secret) {
+    private boolean validateToken(@NonNull String token, @NonNull Key secret) { //Валиация токена
         try {
             Jwts.parserBuilder()
                     .setSigningKey(secret)

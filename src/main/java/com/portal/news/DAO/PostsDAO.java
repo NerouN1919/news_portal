@@ -30,9 +30,9 @@ import java.util.stream.Collectors;
 public class PostsDAO {
     @Autowired
     private EntityManager entityManager;
-    public ResponseEntity<GetPostDTO> addPost(AddPostDTO addPostDTO) throws IOException{
+    public ResponseEntity<GetPostDTO> addPost(AddPostDTO addPostDTO) throws IOException{ //Добавление нового поста
         Session session = entityManager.unwrap(Session.class);
-        if(addPostDTO.getTitle().length() < 5 || addPostDTO.getTitle().length() > 1000){
+        if(addPostDTO.getTitle().length() < 5 || addPostDTO.getTitle().length() > 1000){ //Проверка на корректность введённых данных
             throw new Failed("Wrong length of title");
         }
         Posts posts = new Posts(addPostDTO.getImagePath(), addPostDTO.getTitle());
@@ -43,20 +43,21 @@ public class PostsDAO {
             Files.createDirectories(uploadPath);
         }
         Path filePath = uploadPath.resolve(fileCode+".txt");
-        Files.write(filePath, parts);
+        Files.write(filePath, parts); //Создание файла и добавление туда текст поста
         posts.setHrefToText(fileCode);
         session.save(posts);
-        return getPost(posts.getId());
+        return new ResponseEntity<>(new GetPostDTO(posts.getId(), posts.getDate(), posts.getLike(), posts.getTitle(),
+                posts.getPathToPhoto(), addPostDTO.getText(), null), HttpStatus.OK);
     }
-    public ResponseEntity<Object> downloadImage(String fileCode) {
+    public ResponseEntity<Object> downloadImage(String fileCode) { //Получение изображения
         FileDownloadUtil downloadUtil = new FileDownloadUtil();
         Resource resource = null;
         try {
-            resource = downloadUtil.getFileAsResource(fileCode, "Images");
+            resource = downloadUtil.getFileAsResource(fileCode, "Images"); //получение изображения из хранилища
         } catch (IOException e) {
             return ResponseEntity.internalServerError().build();
         }
-        if (resource == null) {
+        if (resource == null) { //Проверка на существование такого файла
             throw new Failed("File not found");
         }
         String contentType = "application/octet-stream";
@@ -66,23 +67,23 @@ public class PostsDAO {
                 .header(HttpHeaders.CONTENT_DISPOSITION, headerValue)
                 .body(resource);
     }
-    public ResponseEntity<UploadDTO> uploadImageToPost(MultipartFile multipartFile) throws IOException {
+    public ResponseEntity<UploadDTO> uploadImageToPost(MultipartFile multipartFile) throws IOException { //Загрузка изображения
         String fileName = StringUtils.cleanPath(Objects.requireNonNull(multipartFile.getOriginalFilename()));
         String filecode = FileUploadUtil.saveFile(fileName, multipartFile, "Images");
         return new ResponseEntity<>(new UploadDTO(filecode), HttpStatus.OK);
     }
-    public ResponseEntity<ResultLikeDTO> like(LikeDTO likeDTO){
+    public ResponseEntity<ResultLikeDTO> like(LikeDTO likeDTO){ //Поставить лайк посту
         Session session = entityManager.unwrap(Session.class);
         Users users = session.get(Users.class, likeDTO.getUser_id());
-        if(users == null){
+        if(users == null){ //Проверка на наличие пользователя
             throw new Failed("Doesnt have such user");
         }
         Posts posts = session.get(Posts.class, likeDTO.getPost_id());
-        if(posts == null){
+        if(posts == null){ //Проверка на наличие поста
             throw new Failed("Doesnt have such post");
         }
         for(Posts in : users.getLikedPosts()){
-            if(in.equals(posts)){
+            if(in.equals(posts)){ //Проверка на то, поставлен ли уже лайк
                 throw new Failed("Already liked");
             }
         }
@@ -92,14 +93,14 @@ public class PostsDAO {
         session.save(posts);
         return new ResponseEntity<>(new ResultLikeDTO(posts.getId(), posts.getLike()), HttpStatus.OK);
     }
-    public ResponseEntity<ResultLikeDTO> unlike(LikeDTO likeDTO){
+    public ResponseEntity<ResultLikeDTO> unlike(LikeDTO likeDTO){ //Убрать лайк с поста
         Session session = entityManager.unwrap(Session.class);
         Users users = session.get(Users.class, likeDTO.getUser_id());
-        if(users == null){
+        if(users == null){ //Проверка на наличие пользователя
             throw new Failed("Doesnt have such user");
         }
         Posts posts = session.get(Posts.class, likeDTO.getPost_id());
-        if(posts == null){
+        if(posts == null){ //Проверка на наличие поста
             throw new Failed("Doesnt have such post");
         }
         boolean find = false;
@@ -108,7 +109,7 @@ public class PostsDAO {
                 find = true;
             }
         }
-        if(!find){
+        if(!find){ //Проверка на наличие лайка
             throw new Failed("No such like");
         }
         users.removeLike(posts);
@@ -117,34 +118,41 @@ public class PostsDAO {
         session.save(posts);
         return new ResponseEntity<>(new ResultLikeDTO(posts.getId(), posts.getLike()), HttpStatus.OK);
     }
-    public ResponseEntity<GetPostDTO> getPost(Long id){
+    public ResponseEntity<GetPostDTO> getPost(Long post_id, Long user_id){ //Получение информации о посте
         Session session = entityManager.unwrap(Session.class);
-        Posts posts = session.get(Posts.class, id);
-        if(posts == null){
+        Posts posts = session.get(Posts.class, post_id);
+        if(posts == null){ //Проверка на наличие поста
             throw new Failed("Doesnt have such post");
         }
         String content;
+        boolean isLiked = false;
+        for(Users in: posts.getLikes()){
+            if (in.getId().equals(user_id)) {
+                isLiked = true;
+                break;
+            }
+        }
         try {
             content = Files.lines(Paths.get("Posts\\"+posts.getHrefToText()+".txt"))
                     .collect(Collectors.joining(System.lineSeparator()));
-        } catch (IOException e){
+        } catch (IOException e){ //Проверка на корректность информации о посте
             throw new Failed("Invalid post");
         }
         return new ResponseEntity<GetPostDTO>(new GetPostDTO(posts.getId(), posts.getDate(), posts.getLike(),
-                posts.getTitle(), posts.getPathToPhoto(), content), HttpStatus.OK);
+                posts.getTitle(), posts.getPathToPhoto(), content, isLiked), HttpStatus.OK);
     }
-    public ResponseEntity<HowManyDTO> howManyPosts(){
+    public ResponseEntity<HowManyDTO> howManyPosts(){ //Получение количества постов
         Session session = entityManager.unwrap(Session.class);
         Calendar cal2 = Calendar.getInstance();
-        cal2.add(Calendar.DAY_OF_YEAR, -1);
+        cal2.add(Calendar.DAY_OF_YEAR, -1); //Получение даты прошлого дня
         Date dt2 = new Date(cal2.getTimeInMillis());
         return new ResponseEntity<>(new HowManyDTO((long)session.createQuery("select a from Posts a " +
                         "where date>=:date").setParameter("date", dt2)
                 .getResultList().size()), HttpStatus.OK);
     }
-    List<Posts> getPostsList(Session session, long from, long howMuch){
+    List<Posts> getPostsList(Session session, long from, long howMuch){ //Запрос для получения списка постов
         Calendar cal2 = Calendar.getInstance();
-        cal2.add(Calendar.DAY_OF_YEAR, -1);
+        cal2.add(Calendar.DAY_OF_YEAR, -1); //Получение даты прошлого дня
         Date dt2 = new Date(cal2.getTimeInMillis());
         return session.createQuery("select e from Posts e where e.id >= :first and e.id < :second " +
                         "and e.date >= :date order by e.id desc", Posts.class)
@@ -153,7 +161,7 @@ public class PostsDAO {
                 .setParameter("second", from+howMuch)
                 .getResultList();
     }
-    public ResponseEntity<List<?>> getPosts(Long from, Long howMuch){
+    public ResponseEntity<List<?>> getPosts(Long from, Long howMuch, Long user_id){ //Получение списка постов
         if(from < 0){
             throw new Failed("Bad from id");
         }
@@ -167,8 +175,8 @@ public class PostsDAO {
                         Posts.class)
                 .setParameter("date", dt2)
                 .setMaxResults(1).getResultList().get(0).getId();
-        while (list.size() != howMuchBefore){
-            if(from+howMuch>last){
+        while (list.size() != howMuchBefore){ //Проверка на то, пропущены ли посты в базе данных
+            if(from+howMuch>last){ //Проверка хватает ли постов в базе данных
                 throw new Failed("No have so many posts");
             }
             howMuch++;
@@ -181,11 +189,18 @@ public class PostsDAO {
             try {
                 content = Files.lines(Paths.get("Posts\\"+in.getHrefToText()+".txt"))
                         .collect(Collectors.joining(System.lineSeparator()));
-            } catch (IOException e){
+            } catch (IOException e){ //Проверка на наличие файла
                 throw new Failed("No such file");
             }
+            boolean isLiked = false;
+            for(Users user: in.getLikes()) {
+                if (user.getId().equals(user_id)) {
+                    isLiked = true;
+                    break;
+                }
+            }
             result.add(new GetPostDTO(in.getId(), in.getDate(), in.getLike(),
-                    in.getTitle(), in.getPathToPhoto(), content));
+                    in.getTitle(), in.getPathToPhoto(), content, isLiked));
         }
         try{
             result.add(new IdForNextDTO(session.createQuery("select a from Posts a where a.id > :first",

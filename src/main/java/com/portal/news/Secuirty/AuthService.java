@@ -20,14 +20,14 @@ public class AuthService {
 
     public JwtResponse login(@NonNull JwtRequest authRequest) {
         final User user = userService.getByLogin(authRequest.getLogin())
-                .orElseThrow(() -> new AuthException("No such user"));
+                .orElseThrow(() -> new AuthException("No such user")); //Проверка на наличие пользователя
         if (user.getPassword().equals(authRequest.getPassword())) {
             final String accessToken = jwtProvider.generateAccessToken(user);
             final String refreshToken = jwtProvider.generateRefreshToken(user);
             refreshStorage.put(user.getLogin(), refreshToken);
             return new JwtResponse(accessToken, refreshToken);
         } else {
-            throw new AuthException("Wrong passsword");
+            throw new AuthException("Wrong passsword"); //Проверка на совпадение паролей
         }
     }
 
