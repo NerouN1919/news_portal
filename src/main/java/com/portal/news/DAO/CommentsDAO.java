@@ -105,4 +105,14 @@ public class CommentsDAO {
 
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
+    public void deleteComment(Long id){
+        Session session = entityManager.unwrap(Session.class);
+        Comments comments = session.get(Comments.class, id);
+        if (comments == null){
+            throw new Failed("Bad commet id");
+        }
+        File file = new File("./Comments/" + comments.getHrefToComment() + ".txt");
+        file.delete();
+        session.delete(comments);
+    }
 }

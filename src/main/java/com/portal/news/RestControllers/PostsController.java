@@ -53,4 +53,12 @@ public class PostsController {
     public ResponseEntity<HowManyDTO> howManyPosts(){
         return postsService.howManyPosts();
     }
+    @DeleteMapping("/deletePost/{id}")
+    public void deletePost(@PathVariable("id") Long id){
+        postsService.deletePost(id);
+    }
+    @PutMapping("/editPost")
+    public void updatePost(@RequestBody EditPostDTO editPostDTO){
+        postsService.updatePost(editPostDTO);
+    }
 }

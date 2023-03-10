@@ -28,7 +28,7 @@ public class WebSecurityConfig {
                     CorsConfiguration conf = new CorsConfiguration();
                     conf.setAllowedOrigins(Arrays.asList("*"));
                     conf.addAllowedHeader("*");
-                    conf.setAllowedMethods(Arrays.asList("GET", "POST", "PUT"));
+                    conf.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE"));
                     return conf;
                 }).and()
                 .httpBasic().disable()

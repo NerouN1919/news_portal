@@ -1,9 +1,6 @@
 package com.portal.news.RestControllers;
 
-import com.portal.news.DTO.IdDTO;
-import com.portal.news.DTO.LoginDTO;
-import com.portal.news.DTO.RegDTO;
-import com.portal.news.DTO.UserInfoDTO;
+import com.portal.news.DTO.*;
 import com.portal.news.Services.UserService;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,5 +26,9 @@ public class UserCotroller {
     @GetMapping("/getInfo/{id}")
     public ResponseEntity<UserInfoDTO> getUserInfo(@PathVariable("id") Long id){
         return userService.getUserInfo(id);
+    }
+    @GetMapping("/isAdmin/{id}")
+    public ResponseEntity<IsAdminDTO> checkIsAdmin(@PathVariable("id") Long id){
+        return userService.checkIsAdmin(id);
     }
 }

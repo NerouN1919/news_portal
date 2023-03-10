@@ -44,4 +44,12 @@ public class PostsService {
     public ResponseEntity<HowManyDTO> howManyPosts(){
         return postsDAO.howManyPosts();
     }
+    @Transactional
+    public void deletePost(Long id){
+        postsDAO.deletePost(id);
+    }
+    @Transactional
+    public void updatePost(EditPostDTO editPostDTO){
+        postsDAO.updatePost(editPostDTO);
+    }
 }

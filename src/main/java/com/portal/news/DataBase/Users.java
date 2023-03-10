@@ -28,6 +28,8 @@ public class Users {
     private String passwordHash;
     @Column(name = "email")
     private String email;
+    @Column(name = "isAdmin")
+    private Boolean isAdmin = false;
     @ManyToMany
     @JoinTable(
             name = "post_like",

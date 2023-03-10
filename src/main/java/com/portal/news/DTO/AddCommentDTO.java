@@ -6,7 +6,7 @@ import lombok.Data;
 @AllArgsConstructor
 @Data
 public class AddCommentDTO {
-    private Long UserId;
-    private Long PostId;
+    private Long userId;
+    private Long postId;
     private String comment;
 }

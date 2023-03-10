@@ -29,8 +29,11 @@ public class CommentsCotroller {
         return commentsService.getComments(from, howMany, postId);
     }
     @GetMapping("/howMany/{id}")
-    @ResponseBody
     public ResponseEntity<HowManyDTO> howManyComments(@PathVariable("id") Long id){
         return commentsService.howManyComments(id);
+    }
+    @DeleteMapping("/deleteComment/{id}")
+    public void deleteComment(@PathVariable("id") Long id){
+        commentsService.deleteComment(id);
     }
 }

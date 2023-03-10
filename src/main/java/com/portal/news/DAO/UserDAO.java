@@ -3,10 +3,7 @@ package com.portal.news.DAO;
 
 import javax.persistence.EntityManager;
 
-import com.portal.news.DTO.IdDTO;
-import com.portal.news.DTO.LoginDTO;
-import com.portal.news.DTO.RegDTO;
-import com.portal.news.DTO.UserInfoDTO;
+import com.portal.news.DTO.*;
 import com.portal.news.DataBase.Users;
 import com.portal.news.Errors.Failed;
 import org.hibernate.Session;
@@ -64,7 +61,15 @@ public class UserDAO {
         if(need==null){ //ѕроверка на существование такого пользовател€
             throw new Failed("No such id");
         }
-        return new ResponseEntity<>(new UserInfoDTO(need.getId(), need.getEmail(), need.getName(), need.getSurname()),
-                HttpStatus.OK);
+        return new ResponseEntity<>(new UserInfoDTO(need.getId(), need.getEmail(), need.getName(), need.getSurname(),
+                need.getIsAdmin()), HttpStatus.OK);
+    }
+    public ResponseEntity<IsAdminDTO> checkIsAdmin(Long id){
+        Session session = entityManager.unwrap(Session.class);
+        Users users = session.get(Users.class, id);
+        if (users == null){
+            throw new Failed("Bad user id");
+        }
+        return new ResponseEntity<>(new IsAdminDTO(users.getIsAdmin()), HttpStatus.OK);
     }
 }

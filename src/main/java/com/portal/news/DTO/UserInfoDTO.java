@@ -10,4 +10,5 @@ public class UserInfoDTO {
     private String email;
     private String name;
     private String surname;
+    private Boolean isAdmin;
 }

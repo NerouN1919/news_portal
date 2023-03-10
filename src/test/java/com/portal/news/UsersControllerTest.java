@@ -65,7 +65,7 @@ public class UsersControllerTest {
 	@WithMockUser(roles = "ADMIN")
 	public void GetUserInfo_Status_OK() throws Exception {
 		Long id = 1L;
-		UserInfoDTO userInfoDTO = new UserInfoDTO(id, "Email", "Name", "Surname");
+		UserInfoDTO userInfoDTO = new UserInfoDTO(id, "Email", "Name", "Surname", false);
 		when(userDAO.getUserInfo(1L)).thenReturn(new ResponseEntity<>(userInfoDTO, HttpStatus.OK));
 		mockMvc.perform(get("/api/users/getInfo/" + id))
 				.andExpect(status().isOk())

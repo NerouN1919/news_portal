@@ -1,6 +1,7 @@
 package com.portal.news.DAO;
 
 import com.portal.news.DTO.*;
+import com.portal.news.DataBase.Comments;
 import com.portal.news.DataBase.Posts;
 import com.portal.news.DataBase.Users;
 import com.portal.news.Errors.Failed;
@@ -19,6 +20,7 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.persistence.EntityManager;
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -104,9 +106,10 @@ public class PostsDAO {
             throw new Failed("Doesnt have such post");
         }
         boolean find = false;
-        for(Posts in : users.getLikedPosts()){
-            if(in.equals(posts)){
+        for (Posts in : users.getLikedPosts()){
+            if (in.equals(posts)) {
                 find = true;
+                break;
             }
         }
         if(!find){ //Проверка на наличие лайка
@@ -210,5 +213,33 @@ public class PostsDAO {
             result.add(new IdForNextDTO(null));
         }
         return new ResponseEntity<>(result, HttpStatus.OK);
+    }
+    public void deletePost(Long id){
+        Session session = entityManager.unwrap(Session.class);
+        Posts post = session.get(Posts.class, id);
+        if (post == null){
+            throw new Failed("Bad post id");
+        }
+        File file = new File("./Posts/" + post.getHrefToText() + ".txt");
+        file.delete();
+        file = new File("./Images/" + post.getPathToPhoto() + ".jpg");
+        file.delete();
+        List<Comments> list = post.getComments();
+        for(Comments in: list){
+            File commentFile = new File("./Comments/" + in.getHrefToComment() + ".txt");
+            commentFile.delete();
+        }
+        session.delete(post);
+    }
+    public void updatePost(EditPostDTO editPostDTO){
+        Session session = entityManager.unwrap(Session.class);
+        Posts post = session.get(Posts.class, editPostDTO.getId());
+        Path filePath = Paths.get("Posts/" + post.getHrefToText() + ".txt");
+        List<String> parts = Arrays.asList(editPostDTO.getText().split("\n"));
+        try {
+            Files.write(filePath, parts); //Создание файла и добавление туда текст поста
+        } catch (IOException e) {
+            throw new Failed("Bad file");
+        }
     }
 }

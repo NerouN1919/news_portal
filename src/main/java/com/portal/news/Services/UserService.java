@@ -1,10 +1,7 @@
 package com.portal.news.Services;
 
 import com.portal.news.DAO.UserDAO;
-import com.portal.news.DTO.IdDTO;
-import com.portal.news.DTO.LoginDTO;
-import com.portal.news.DTO.RegDTO;
-import com.portal.news.DTO.UserInfoDTO;
+import com.portal.news.DTO.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -25,5 +22,9 @@ public class UserService {
     @Transactional
     public ResponseEntity<UserInfoDTO> getUserInfo(Long id){
         return userDAO.getUserInfo(id);
+    }
+    @Transactional
+    public ResponseEntity<IsAdminDTO> checkIsAdmin(Long id){
+        return userDAO.checkIsAdmin(id);
     }
 }

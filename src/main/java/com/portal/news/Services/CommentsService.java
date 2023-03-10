@@ -27,4 +27,8 @@ public class CommentsService {
     public ResponseEntity<HowManyDTO> howManyComments(Long id){
         return commentsDAO.howManyComments(id);
     }
+    @Transactional
+    public void deleteComment(Long id){
+        commentsDAO.deleteComment(id);
+    }
 }
