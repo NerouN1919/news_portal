@@ -33,9 +33,6 @@ services:
 Тело запроса смотреть в документации к API    
 login : **SviridenkoAdmin**  
 password : **12345**  
-Или:  
-login : **MorozovAdmin**  
-password : **12345**  
 
 -------------------------  
 Полученные JWT вставлять в headers запросов  
