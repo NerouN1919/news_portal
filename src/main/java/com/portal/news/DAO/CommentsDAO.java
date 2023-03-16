@@ -53,8 +53,8 @@ public class CommentsDAO {
         return new ResponseEntity<>(new HowManyDTO((long) posts.getComments().size()), HttpStatus.OK);
     }
     private List<Comments> getListForGetComments(Session session, Long from, Long howMuch, Long postId){ //Запрос для получения списка комментариев из бд
-        return session.createQuery("select e from Comments e where e.id >= :first " +
-                        "and e.id <= :second and e.post = :third", Comments.class)
+        return session.createQuery("select e from Comments e where e.id between :first and :second " +
+                        "and e.post = :third", Comments.class)
                 .setParameter("first", from-howMuch)
                 .setParameter("second", from)
                 .setParameter("third", session.get(Posts.class, postId))
@@ -84,14 +84,19 @@ public class CommentsDAO {
         Collections.reverse(list);
         List<Object> result = new ArrayList<>();
         for(Comments in: list){
-            String content;
+            StringBuilder content = new StringBuilder();
             try {
-                content = Files.lines(Paths.get("Comments\\"+in.getHrefToComment()+".txt"))
-                        .collect(Collectors.joining(System.lineSeparator()));
+                BufferedReader bufferedReader = new BufferedReader(new FileReader("./Comments/" +
+                        in.getHrefToComment() + ".txt"));
+                String line;
+                while((line = bufferedReader.readLine()) != null) {
+                    content.append(line).append("\n");
+                }
+
             } catch (IOException e){
                 throw new Failed("No such file"); //Проверка на наличие файла
             }
-            result.add(new ReturnedCommentDTO(content, in.getPost().getId(), in.getUser().getId(), in.getDate()));
+            result.add(new ReturnedCommentDTO(content.toString(), in.getPost().getId(), in.getUser().getId(), in.getDate()));
         }
         try {
             result.add(new IdForNextDTO(session.createQuery("select a from Comments a where a.id < :first and " +

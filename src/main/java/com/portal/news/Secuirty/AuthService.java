@@ -63,8 +63,5 @@ public class AuthService {
         throw new AuthException("Invalid JWT");
     }
 
-    public JwtAuthentication getAuthInfo() {
-        return (JwtAuthentication) SecurityContextHolder.getContext().getAuthentication();
-    }
 
 }

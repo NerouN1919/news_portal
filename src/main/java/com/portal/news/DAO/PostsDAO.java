@@ -20,13 +20,14 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.persistence.EntityManager;
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileReader;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Repository
 public class PostsDAO {
@@ -127,7 +128,7 @@ public class PostsDAO {
         if(posts == null){ //Проверка на наличие поста
             throw new Failed("Doesnt have such post");
         }
-        String content;
+        StringBuilder content = new StringBuilder();
         boolean isLiked = false;
         for(Users in: posts.getLikes()){
             if (in.getId().equals(user_id)) {
@@ -136,13 +137,17 @@ public class PostsDAO {
             }
         }
         try {
-            content = Files.lines(Paths.get("Posts\\"+posts.getHrefToText()+".txt"))
-                    .collect(Collectors.joining(System.lineSeparator()));
+            BufferedReader in = new BufferedReader(new FileReader("./Posts/" + posts.getHrefToText() + ".txt"));
+            String line;
+            while((line = in.readLine()) != null) {
+                content.append(line).append("\n");
+            }
         } catch (IOException e){ //Проверка на корректность информации о посте
+            System.out.println(e.getMessage());
             throw new Failed("Invalid post");
         }
         return new ResponseEntity<GetPostDTO>(new GetPostDTO(posts.getId(), posts.getDate(), posts.getLike(),
-                posts.getTitle(), posts.getPathToPhoto(), content, isLiked), HttpStatus.OK);
+                posts.getTitle(), posts.getPathToPhoto(), content.toString(), isLiked), HttpStatus.OK);
     }
     public ResponseEntity<HowManyDTO> howManyPosts(){ //Получение количества постов
         Session session = entityManager.unwrap(Session.class);
@@ -188,10 +193,13 @@ public class PostsDAO {
         Collections.reverse(list);
         List<Object> result = new ArrayList<>();
         for(Posts in : list){
-            String content;
+            StringBuilder content = new StringBuilder();
             try {
-                content = Files.lines(Paths.get("Posts\\"+in.getHrefToText()+".txt"))
-                        .collect(Collectors.joining(System.lineSeparator()));
+                BufferedReader bufferedReader = new BufferedReader(new FileReader("./Posts/" + in.getHrefToText() + ".txt"));
+                String line;
+                while((line = bufferedReader.readLine()) != null) {
+                    content.append(line).append("\n");
+                }
             } catch (IOException e){ //Проверка на наличие файла
                 throw new Failed("No such file");
             }
@@ -203,7 +211,7 @@ public class PostsDAO {
                 }
             }
             result.add(new GetPostDTO(in.getId(), in.getDate(), in.getLike(),
-                    in.getTitle(), in.getPathToPhoto(), content, isLiked));
+                    in.getTitle(), in.getPathToPhoto(), content.toString(), isLiked));
         }
         try{
             result.add(new IdForNextDTO(session.createQuery("select a from Posts a where a.id > :first",

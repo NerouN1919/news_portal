@@ -1,7 +1,6 @@
 package com.portal.news.RestControllers;
 
 import com.portal.news.DTO.*;
-import com.portal.news.DataBase.Posts;
 import com.portal.news.Services.PostsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -27,7 +26,7 @@ public class PostsController {
     public ResponseEntity<UploadDTO> uploadImageToPost(@RequestParam("file") MultipartFile multipartFile) throws IOException{
         return postsService.uploadImageToPost(multipartFile);
     }
-    @GetMapping("/downloadImage/{fileCode}")
+    @GetMapping(value = "/downloadImage/{fileCode}", produces = "image/jpg")
     public ResponseEntity<Object> downloadImage(@PathVariable("fileCode") String fileCode) {
         return postsService.downloadImage(fileCode);
     }

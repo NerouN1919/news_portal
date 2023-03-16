@@ -7,7 +7,10 @@ plugins {
 group = 'com.portal'
 version = '0.0.1-SNAPSHOT'
 sourceCompatibility = JavaVersion.VERSION_1_8
-
+compileJava.options.encoding = 'UTF-8'
+tasks.withType(JavaCompile) {
+	options.encoding = 'UTF-8'
+}
 configurations {
 	compileOnly {
 		extendsFrom annotationProcessor

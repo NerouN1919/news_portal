@@ -143,7 +143,7 @@ public class PostsDaoTest {
         postsDAO.like(new LikeDTO(1L, 1L));
         GetPostDTO getPostDTO = postsDAO.getPost(1L, 1L).getBody();
         assert getPostDTO != null;
-        Assertions.assertEquals(getPostDTO.getText(), "text");
+        Assertions.assertEquals(getPostDTO.getText(), "text\n");
         Assertions.assertEquals(getPostDTO.getPathToPhoto(), "imagePath");
         Assertions.assertEquals(getPostDTO.getId(), 1L);
         Assertions.assertEquals(getPostDTO.getTitle(), "title");
