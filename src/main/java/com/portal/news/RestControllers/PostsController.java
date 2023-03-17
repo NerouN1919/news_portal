@@ -26,7 +26,8 @@ public class PostsController {
     public ResponseEntity<UploadDTO> uploadImageToPost(@RequestParam("file") MultipartFile multipartFile) throws IOException{
         return postsService.uploadImageToPost(multipartFile);
     }
-    @GetMapping(value = "/downloadImage/{fileCode}", produces = "image/jpg")
+    @GetMapping(value = "/downloadImage/{fileCode}", produces = {MediaType.IMAGE_JPEG_VALUE,
+            MediaType.IMAGE_PNG_VALUE})
     public ResponseEntity<Object> downloadImage(@PathVariable("fileCode") String fileCode) {
         return postsService.downloadImage(fileCode);
     }
