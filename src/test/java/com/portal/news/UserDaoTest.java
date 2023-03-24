@@ -21,6 +21,7 @@ import java.util.Objects;
 @DataJpaTest(includeFilters = @ComponentScan.Filter(type = FilterType.ANNOTATION, classes = Repository.class))
 @DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
 @ComponentScan("com.portal.news")
+
 public class UserDaoTest {
     @Autowired
     UserDAO userDAO;

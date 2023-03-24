@@ -4,10 +4,13 @@ package com.portal.news;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.portal.news.DAO.UserDAO;
 import com.portal.news.DTO.*;
+import com.portal.news.DataBase.Users;
 import com.portal.news.RestControllers.UserCotroller;
 import com.portal.news.Secuirty.JwtFilter;
 import com.portal.news.Services.UserService;
+import com.sun.tools.javac.util.List;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -15,8 +18,12 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
+
+import java.util.ArrayList;
+import java.util.Collections;
 
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -35,6 +42,8 @@ public class UsersControllerTest {
 	UserService userService;
 	@MockBean
 	JwtFilter jwtFilter;
+	@MockBean
+	PasswordEncoder passwordEncoder;
 	@Test
 	@WithMockUser(roles = "ADMIN")
 	public void RegistrationTest_Status_Ok() throws Exception {

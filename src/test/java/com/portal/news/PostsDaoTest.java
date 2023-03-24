@@ -18,10 +18,12 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Repository;
 import org.springframework.test.annotation.DirtiesContext;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Base64;
 import java.util.List;
 
 @DataJpaTest(includeFilters = @ComponentScan.Filter(type = FilterType.ANNOTATION, classes = Repository.class))
@@ -223,9 +225,9 @@ public class PostsDaoTest {
         Path uploadPath = Paths.get("Images");
         assert uploadDTO != null;
         Path filePath = uploadPath.resolve(uploadDTO.getPath()+"-filename.jpg");
-        Resource resource = (Resource) postsDAO.downloadImage(uploadDTO.getPath()).getBody();
-        assert resource != null;
-        Assertions.assertEquals(filePath.getFileName().toString(), resource.getFilename());
+        String shouldRes = Base64.getEncoder().encodeToString(Files.readAllBytes(filePath));
+        String returned = (String) postsDAO.downloadImage(uploadDTO.getPath()).getBody();
+        Assertions.assertEquals(shouldRes, returned);
     }
     @Test
     public void downloadImageBadRequest() throws IOException {

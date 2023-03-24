@@ -63,12 +63,15 @@ public class PostsDAO {
         if (resource == null) { //Проверка на существование такого файла
             throw new Failed("File not found");
         }
-        String contentType = "application/octet-stream";
         String headerValue = "attachment; filename=\"" + resource.getFilename() + "\"";
-        return ResponseEntity.ok()
-                .contentType(MediaType.parseMediaType(contentType))
-                .header(HttpHeaders.CONTENT_DISPOSITION, headerValue)
-                .body(resource);
+        try {
+            return ResponseEntity.ok()
+                    .contentType(MediaType.APPLICATION_OCTET_STREAM)
+                    .header(HttpHeaders.CONTENT_DISPOSITION, headerValue)
+                    .body(Base64.getEncoder().encodeToString(Files.readAllBytes(resource.getFile().toPath())));
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
     public ResponseEntity<UploadDTO> uploadImageToPost(MultipartFile multipartFile) throws IOException { //Загрузка изображения
         String fileName = StringUtils.cleanPath(Objects.requireNonNull(multipartFile.getOriginalFilename()));
