@@ -43,7 +43,8 @@ public class Posts {
         users.addComment(comments);
         this.comments.add(comments);
     }
-    private void deleteComment(Comments comments, Users users){
+    public void deleteComment(Comments comments){
+        Users users = comments.getUser();
         comments.setPost(null);
         comments.setUser(null);
         users.deleteComment(comments);

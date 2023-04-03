@@ -149,7 +149,7 @@ public class PostsDAO {
             System.out.println(e.getMessage());
             throw new Failed("Invalid post");
         }
-        return new ResponseEntity<GetPostDTO>(new GetPostDTO(posts.getId(), posts.getDate(), posts.getLike(),
+        return new ResponseEntity<>(new GetPostDTO(posts.getId(), posts.getDate(), posts.getLike(),
                 posts.getTitle(), posts.getPathToPhoto(), content.toString(), isLiked), HttpStatus.OK);
     }
     public ResponseEntity<HowManyDTO> howManyPosts(){ //Получение количества постов
@@ -245,6 +245,9 @@ public class PostsDAO {
     public void updatePost(EditPostDTO editPostDTO){
         Session session = entityManager.unwrap(Session.class);
         Posts post = session.get(Posts.class, editPostDTO.getId());
+        if(post == null) {
+            throw new Failed("Bad post id");
+        }
         Path filePath = Paths.get("Posts/" + post.getHrefToText() + ".txt");
         List<String> parts = Arrays.asList(editPostDTO.getText().split("\n"));
         try {

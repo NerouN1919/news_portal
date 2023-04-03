@@ -3,6 +3,7 @@ package com.portal.news.RestControllers;
 import com.portal.news.DTO.AddCommentDTO;
 import com.portal.news.DTO.HowManyDTO;
 import com.portal.news.Services.CommentsService;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;

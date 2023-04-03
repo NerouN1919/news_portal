@@ -114,8 +114,10 @@ public class CommentsDAO {
         Session session = entityManager.unwrap(Session.class);
         Comments comments = session.get(Comments.class, id);
         if (comments == null){
-            throw new Failed("Bad commet id");
+            throw new Failed("Bad comment id");
         }
+        Posts posts = comments.getPost();
+        posts.deleteComment(comments);
         File file = new File("./Comments/" + comments.getHrefToComment() + ".txt");
         file.delete();
         session.delete(comments);

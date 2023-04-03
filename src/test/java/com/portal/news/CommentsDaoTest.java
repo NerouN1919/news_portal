@@ -19,6 +19,7 @@ import org.springframework.test.annotation.DirtiesContext;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Objects;
 
 @DataJpaTest(includeFilters = @ComponentScan.Filter(type = FilterType.ANNOTATION, classes = Repository.class))
 @DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
@@ -125,6 +126,33 @@ public class CommentsDaoTest {
             commentsDAO.getComments(0L, 3L, 20L);
         } catch (Failed e){
             Assertions.assertEquals(e.getMessage(), "No such post");
+            isSuccess = true;
+        }
+        Assertions.assertTrue(isSuccess);
+    }
+    @Test
+    public void deleteCommentShouldReturnGood() throws IOException {
+        postsDAO.addPost(new AddPostDTO("title", "text", "imagePath"));
+        userDAO.registration(new RegDTO("Name", "Surname", "email@mail.ru", "password"));
+        for (int i = 0; i < 5; i++) {
+            commentsDAO.addComment(new AddCommentDTO(1L, 1L, "comment " + i));
+        }
+        commentsDAO.deleteComment(1L);
+        Assertions.assertEquals(Objects.requireNonNull(commentsDAO.howManyComments(1L).getBody()).getSize(),
+                4);
+    }
+    @Test
+    public void deleteCommentBadRequest() throws IOException {
+        postsDAO.addPost(new AddPostDTO("title", "text", "imagePath"));
+        userDAO.registration(new RegDTO("Name", "Surname", "email@mail.ru", "password"));
+        for (int i = 0; i < 5; i++) {
+            commentsDAO.addComment(new AddCommentDTO(1L, 1L, "comment " + i));
+        }
+        boolean isSuccess = false;
+        try {
+            commentsDAO.deleteComment(6L);
+        } catch (Failed e) {
+            Assertions.assertEquals(e.getMessage(), "Bad comment id");
             isSuccess = true;
         }
         Assertions.assertTrue(isSuccess);

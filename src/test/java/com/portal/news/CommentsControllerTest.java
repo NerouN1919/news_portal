@@ -24,10 +24,8 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.mockito.Mockito.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(CommentsCotroller.class)
@@ -45,7 +43,7 @@ public class CommentsControllerTest {
     CommentsService commentsService;
     @Test
     @WithMockUser(roles = "ADMIN")
-    public void AddCommentTest_Status_Ok() throws Exception {
+    public void addCommentTestStatusOk() throws Exception {
         AddCommentDTO addCommentDTO = new AddCommentDTO(1L, 1L, "Comment");
         doNothing().when(commentsDAO).addComment(addCommentDTO);
         mockMvc.perform(post("/api/comments/addComment")
@@ -58,7 +56,7 @@ public class CommentsControllerTest {
     }
     @Test
     @WithMockUser(roles = "ADMIN")
-    public void GetCommentsTest_Status_Ok() throws Exception {
+    public void getCommentsTestStatusOk() throws Exception {
         List<?> response = Arrays.asList(new ReturnedCommentDTO("CommentFirst", 1L, 1L, new Date()),
                 new ReturnedCommentDTO("CommentSecond", 1L, 2L, new Date()),
                 new IdForNextDTO(1L));
@@ -71,13 +69,23 @@ public class CommentsControllerTest {
     }
     @Test
     @WithMockUser(roles = "ADMIN")
-    public void HowManyComments_Status_Ok() throws Exception {
+    public void howManyCommentsStatusOk() throws Exception {
         HowManyDTO howMany = new HowManyDTO(4L);
         when(commentsDAO.howManyComments(1L))
                 .thenReturn(new ResponseEntity<>(howMany, HttpStatus.OK));
         mockMvc.perform(get("/api/comments/howMany/1"))
                 .andExpect(status().isOk())
                 .andExpect(content().json(objectMapper.writeValueAsString(howMany)))
+                .andReturn();
+    }
+    @Test
+    @WithMockUser(roles = "ADMIN")
+    public void deleteCommentStatusOk() throws Exception {
+        Long id = 1L;
+        doNothing().when(commentsDAO).deleteComment(id);
+        mockMvc.perform(delete("/api/comments/deleteComment/" + id))
+                .andExpect(status().isOk())
+                .andExpect(content().string(""))
                 .andReturn();
     }
 }

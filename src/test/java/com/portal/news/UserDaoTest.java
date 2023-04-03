@@ -29,6 +29,7 @@ public class UserDaoTest {
     PasswordEncoder passwordEncoder;
     @MockBean
     JwtFilter jwtFilter;
+
     @Test
     public void getInfoNoSuchUser() {
         userDAO.registration(new RegDTO("First", "User", "first_user@mail.ru", "Password"));
@@ -42,6 +43,7 @@ public class UserDaoTest {
         }
         Assertions.assertTrue(isSuccess);
     }
+
     @Test
     public void getInfoShouldReturnGood() {
         userDAO.registration(new RegDTO("First", "User", "first_user@mail.ru", "Password"));
@@ -59,70 +61,91 @@ public class UserDaoTest {
         Assertions.assertEquals(userInfoDTO.getSurname(), "User");
         Assertions.assertNotEquals(userInfoDTO.getId(), 1L);
     }
+
     @Test
     public void registrationShouldReturnGood() {
         Assertions.assertEquals(userDAO.registration(
-                new RegDTO("First", "User", "first_user@mail.ru", "Password"))
+                        new RegDTO("First", "User", "first_user@mail.ru", "Password"))
                 .getBody().getId(), 1L);
     }
+
     @Test
-    public void registrationBadRequest(){
+    public void registrationBadRequest() {
         boolean isSuccess = false;
-        try{
+        try {
             userDAO.registration(new RegDTO("first", "User", "first_user@mail.ru", "Password"));
-        } catch (Failed e){
+        } catch (Failed e) {
             Assertions.assertEquals(e.getMessage(), "Bad name");
             isSuccess = true;
         }
         Assertions.assertTrue(isSuccess);
         isSuccess = false;
-        try{
+        try {
             userDAO.registration(new RegDTO("First", "user", "first_user@mail.ru", "Password"));
-        } catch (Failed e){
+        } catch (Failed e) {
             Assertions.assertEquals(e.getMessage(), "Bad surname");
             isSuccess = true;
         }
         Assertions.assertTrue(isSuccess);
         isSuccess = false;
-        try{
+        try {
             userDAO.registration(new RegDTO("First", "User", "first_user", "Password"));
-        } catch (Failed e){
+        } catch (Failed e) {
             Assertions.assertEquals(e.getMessage(), "Bad email");
             isSuccess = true;
         }
         Assertions.assertTrue(isSuccess);
         isSuccess = false;
-        try{
+        try {
             userDAO.registration(new RegDTO("First", "User", "first_user@mail.ru", "Password"));
             userDAO.registration(new RegDTO("First", "User", "first_user@mail.ru", "Password"));
-        } catch (Failed e){
+        } catch (Failed e) {
             Assertions.assertEquals(e.getMessage(), "Exists this email");
             isSuccess = true;
         }
         Assertions.assertTrue(isSuccess);
     }
+
     @Test
-    public void loginShouldReturnGood(){
+    public void loginShouldReturnGood() {
         userDAO.registration(new RegDTO("First", "User", "first_user@mail.ru", "Password"));
         Assertions.assertEquals(Objects.requireNonNull(userDAO.login(new LoginDTO("first_user@mail.ru", "Password"))
                 .getBody()).getId(), 1L);
     }
+
     @Test
-    public void loginBadLogin(){
+    public void loginBadLogin() {
         userDAO.registration(new RegDTO("First", "User", "first_user@mail.ru", "Password"));
         boolean isSuccess = false;
-        try{
+        try {
             userDAO.login(new LoginDTO("bad_login@mail.ru", "Password"));
-        } catch (Failed e){
+        } catch (Failed e) {
             Assertions.assertEquals(e.getMessage(), "Dont have such email");
             isSuccess = true;
         }
         Assertions.assertTrue(isSuccess);
         isSuccess = false;
-        try{
+        try {
             userDAO.login(new LoginDTO("first_user@mail.ru", "BadPassword"));
-        } catch (Failed e){
+        } catch (Failed e) {
             Assertions.assertEquals(e.getMessage(), "Wrong password");
+            isSuccess = true;
+        }
+        Assertions.assertTrue(isSuccess);
+    }
+
+    @Test
+    public void isAdminShouldReturnGood() {
+        userDAO.registration(new RegDTO("First", "User", "first_user@mail.ru", "Password"));
+        Assertions.assertFalse(Objects.requireNonNull(userDAO.checkIsAdmin(1L).getBody()).isAdmin());
+    }
+    @Test
+    public void isAdminBadRequest() {
+        boolean isSuccess = false;
+        try {
+            userDAO.checkIsAdmin(1L);
+        } catch (Failed e) {
+            Assertions.assertEquals(e.getMessage(), "Bad user id");
             isSuccess = true;
         }
         Assertions.assertTrue(isSuccess);

@@ -6,6 +6,7 @@ import com.portal.news.DTO.*;
 import com.portal.news.RestControllers.PostsController;
 import com.portal.news.Secuirty.JwtFilter;
 import com.portal.news.Services.PostsService;
+import org.hibernate.sql.Update;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -24,6 +25,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
@@ -44,7 +46,7 @@ public class PostsControllerTest {
     JwtFilter jwtFilter;
     @Test
     @WithMockUser(roles = "ADMIN")
-    public void AddPostTest_Status_Ok() throws Exception {
+    public void addPostTestStatusOk() throws Exception {
         AddPostDTO addPostDTO = new AddPostDTO("Title", "Text", "ImagePath");
         GetPostDTO getPostDTO = new GetPostDTO(1L, new Date(), 0L, "Title",
                 "ImagePath", "Text", null);
@@ -60,7 +62,7 @@ public class PostsControllerTest {
     }
     @Test
     @WithMockUser(roles = "ADMIN")
-    public void downloadImageTest_Status_Ok() throws Exception {
+    public void downloadImageTestStatusOk() throws Exception {
         String contentType = "application/octet-stream";
         String headerValue = "attachment; filename=\"Code";
         ResponseEntity<Object> responseEntity = ResponseEntity.ok()
@@ -74,7 +76,7 @@ public class PostsControllerTest {
     }
     @Test
     @WithMockUser(roles = "ADMIN")
-    public void getPostTest_Status_Ok() throws Exception {
+    public void getPostTestStatusOk() throws Exception {
         GetPostDTO getPostDTO = new GetPostDTO(1L, new Date(), 0L, "Title",
                 "ImagePath", "Text", false);
         when(postsDAO.getPost(1L, 0L)).thenReturn(new ResponseEntity<>(getPostDTO, HttpStatus.OK));
@@ -85,7 +87,7 @@ public class PostsControllerTest {
     }
     @Test
     @WithMockUser(roles = "ADMIN")
-    public void getPostsTest_Status_Ok() throws Exception {
+    public void getPostsTestStatusOk() throws Exception {
         List<Object> result = new ArrayList<>();
         result.add(new GetPostDTO(1L, new Date(), 0L, "Title",
                 "ImagePath", "Text", false));
@@ -100,7 +102,7 @@ public class PostsControllerTest {
     }
     @Test
     @WithMockUser(roles = "ADMIN")
-    public void howManyPostsTest_Status_Ok() throws Exception {
+    public void howManyPostsTestStatusOk() throws Exception {
         HowManyDTO howManyDTO = new HowManyDTO(5L);
         when(postsDAO.howManyPosts()).thenReturn(new ResponseEntity<>(howManyDTO, HttpStatus.OK));
         mockMvc.perform(get("/api/posts/howMany"))
@@ -110,7 +112,7 @@ public class PostsControllerTest {
     }
     @Test
     @WithMockUser(roles = "ADMIN")
-    public void likeTest_Status_Ok() throws Exception {
+    public void likeTestStatusOk() throws Exception {
         LikeDTO likeDTO = new LikeDTO(1L, 2L);
         ResultLikeDTO resultLikeDTO = new ResultLikeDTO(2L, 1L);
         when(postsDAO.like(likeDTO)).thenReturn(new ResponseEntity<>(resultLikeDTO, HttpStatus.OK));
@@ -124,7 +126,7 @@ public class PostsControllerTest {
     }
     @Test
     @WithMockUser(roles = "ADMIN")
-    public void unlikeTest_Status_Ok() throws Exception {
+    public void unlikeTestStatusOk() throws Exception {
         LikeDTO likeDTO = new LikeDTO(1L, 2L);
         ResultLikeDTO resultLikeDTO = new ResultLikeDTO(2L, 0L);
         when(postsDAO.unlike(likeDTO)).thenReturn(new ResponseEntity<>(resultLikeDTO, HttpStatus.OK));
@@ -138,13 +140,36 @@ public class PostsControllerTest {
     }
     @Test
     @WithMockUser(roles = "ADMIN")
-    public void uploadImageToPostTest_Status_Ok() throws Exception {
+    public void uploadImageToPostTestStatusOk() throws Exception {
         MockMultipartFile multipartFile = new MockMultipartFile("file", "filename.jpg", "image/jpeg", "some xml".getBytes());
         UploadDTO uploadDTO = new UploadDTO("Path");
         when(postsDAO.uploadImageToPost(multipartFile)).thenReturn(new ResponseEntity<>(uploadDTO, HttpStatus.OK));
         mockMvc.perform(multipart("/api/posts/uploadImageToPost").file(multipartFile))
                 .andExpect(status().isOk())
                 .andExpect(content().json(objectMapper.writeValueAsString(uploadDTO)))
+                .andReturn();
+    }
+    @Test
+    @WithMockUser(roles = "ADMIN")
+    public void deletePostStatusOk() throws Exception {
+        Long id = 1L;
+        doNothing().when(postsDAO).deletePost(id);
+        mockMvc.perform(delete("/api/posts/deletePost/" + id))
+                .andExpect(status().isOk())
+                .andExpect(content().string(""))
+                .andReturn();
+    }
+    @Test
+    @WithMockUser(roles = "ADMIN")
+    public void updatePostStatusOk() throws Exception {
+        EditPostDTO editPostDTO = new EditPostDTO(1L, "New text");
+        doNothing().when(postsDAO).updatePost(editPostDTO);
+        mockMvc.perform(put("/api/posts/editPost")
+                        .contentType("application/json")
+                        .content(objectMapper.writeValueAsString(editPostDTO))
+                        .characterEncoding("utf-8"))
+                .andExpect(status().isOk())
+                .andExpect(content().string(""))
                 .andReturn();
     }
 }

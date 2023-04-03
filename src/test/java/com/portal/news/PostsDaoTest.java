@@ -25,6 +25,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Base64;
 import java.util.List;
+import java.util.Objects;
 
 @DataJpaTest(includeFilters = @ComponentScan.Filter(type = FilterType.ANNOTATION, classes = Repository.class))
 @DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
@@ -236,6 +237,53 @@ public class PostsDaoTest {
             postsDAO.downloadImage("failedCode");
         } catch (Failed e){
             Assertions.assertEquals(e.getMessage(), "File not found");
+            isSuccess = true;
+        }
+        Assertions.assertTrue(isSuccess);
+    }
+    @Test
+    public void deletePostReturnGood() throws IOException {
+        AddPostDTO addPostDTO = new AddPostDTO("title", "text", "imagePath");
+        postsDAO.addPost(addPostDTO);
+        try {
+            postsDAO.getPost(1L, 1L);
+        } catch (Failed e){
+            Assertions.fail();
+        }
+        postsDAO.deletePost(1L);
+        boolean isSuccess = false;
+        try {
+            postsDAO.getPost(1L, 1L);
+        } catch (Failed e){
+            isSuccess = true;
+        }
+        Assertions.assertTrue(isSuccess);
+    }
+    @Test
+    public void deletePostBadRequest() throws Exception {
+        boolean isSuccess = false;
+        try {
+            postsDAO.deletePost(1L);
+        } catch (Failed e){
+            Assertions.assertEquals(e.getMessage(), "Bad post id");
+            isSuccess = true;
+        }
+        Assertions.assertTrue(isSuccess);
+    }
+    @Test
+    public void updatePostReturnGood() throws IOException {
+        postsDAO.addPost(new AddPostDTO("title", "text", "imagePath"));
+        postsDAO.updatePost(new EditPostDTO(1L, "new text"));
+        Assertions.assertEquals(Objects.requireNonNull(postsDAO.getPost(1L, 1L).getBody()).getText(),
+                "new text\n");
+    }
+    @Test
+    public void updatePostBadRequest() {
+        boolean isSuccess = false;
+        try {
+            postsDAO.updatePost(new EditPostDTO(1L, "must be failed"));
+        } catch (Failed e){
+            Assertions.assertEquals(e.getMessage(), "Bad post id");
             isSuccess = true;
         }
         Assertions.assertTrue(isSuccess);
